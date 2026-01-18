@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --primary-red: #E30613;
+    --dark-grey: #333333;
+    --black: #000000;
+    --white: #FFFFFF;
+  }
+
+  body {
+    @apply bg-white text-black antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1 {
+    @apply text-5xl md:text-6xl font-bold leading-tight;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl font-semibold leading-snug;
+  }
+
+  h3 {
+    @apply text-xl md:text-2xl font-medium leading-normal;
+  }
+
+  p {
+    @apply text-base md:text-lg leading-relaxed;
+  }
+}
+
+@layer components {
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .btn-primary {
+    @apply bg-[#E30613] text-white px-6 py-3 rounded font-semibold hover:bg-[#C00510] transition-colors duration-200;
+  }
+
+  .btn-secondary {
+    @apply bg-[#333333] text-white px-6 py-3 rounded font-semibold hover:bg-[#1a1a1a] transition-colors duration-200;
+  }
+
+  .card {
+    @apply bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200;
+  }
+}
