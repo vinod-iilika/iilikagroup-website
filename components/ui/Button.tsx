@@ -16,9 +16,9 @@ export default function Button({
   const baseStyles = "font-semibold rounded transition-all duration-200 inline-block text-center";
 
   const variantStyles = {
-    primary: "bg-[#E30613] text-white hover:bg-[#C00510]",
-    secondary: "bg-[#333333] text-white hover:bg-[#1a1a1a]",
-    outline: "border-2 border-[#E30613] text-[#E30613] hover:bg-[#E30613] hover:text-white",
+    primary: "bg-[#FF000E] text-white hover:bg-[#9E0008]",
+    secondary: "bg-[#A3A3A3] text-black hover:bg-[#8A8A8A]",
+    outline: "border-2 border-[#FF000E] text-[#FF000E] hover:bg-[#FF000E] hover:text-white",
   };
 
   const sizeStyles = {

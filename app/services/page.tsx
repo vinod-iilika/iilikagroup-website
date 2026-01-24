@@ -78,7 +78,7 @@ export default function Services() {
                   {service.features.map((feature, idx) => (
                     <li key={idx} className="flex items-start">
                       <svg
-                        className="w-6 h-6 text-[#E30613] mr-3 mt-1 flex-shrink-0"
+                        className="w-6 h-6 text-[#FF000E] mr-3 mt-1 flex-shrink-0"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >

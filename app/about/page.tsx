@@ -54,7 +54,7 @@ export default function About() {
                 </p>
               </div>
             </div>
-            <div className="bg-gradient-to-br from-[#E30613] to-[#C00510] h-[400px] rounded-lg shadow-xl"></div>
+            <div className="bg-gradient-to-br from-[#FF000E] to-[#9E0008] h-[400px] rounded-lg shadow-xl"></div>
           </div>
         </div>
       </section>

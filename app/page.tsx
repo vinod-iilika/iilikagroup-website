@@ -73,7 +73,7 @@ export default function Home() {
               { number: "95%", label: "Client Retention" },
             ].map((stat, index) => (
               <div key={index} className="text-center p-6">
-                <div className="text-5xl font-bold text-[#E30613] mb-2">{stat.number}</div>
+                <div className="text-5xl font-bold text-[#FF000E] mb-2">{stat.number}</div>
                 <div className="text-[#333333] font-medium">{stat.label}</div>
               </div>
             ))}

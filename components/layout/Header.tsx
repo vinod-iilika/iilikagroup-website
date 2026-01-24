@@ -20,7 +20,7 @@ export default function Header() {
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
       <nav className="container-custom">
         <div className="flex items-center justify-between h-20">
-          <Link href="/" className="text-2xl font-bold text-[#E30613]">
+          <Link href="/" className="text-2xl font-bold text-[#FF000E]">
             IILIKA GROUPS
           </Link>
 
@@ -29,7 +29,7 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-[#333333] hover:text-[#E30613] font-medium transition-colors duration-200"
+                className="text-[#333333] hover:text-[#FF000E] font-medium transition-colors duration-200"
               >
                 {link.name}
               </Link>
@@ -65,7 +65,7 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="block py-3 text-[#333333] hover:text-[#E30613] font-medium transition-colors duration-200"
+                className="block py-3 text-[#333333] hover:text-[#FF000E] font-medium transition-colors duration-200"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {link.name}

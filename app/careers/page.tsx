@@ -152,7 +152,7 @@ export default function Careers() {
                 <label className="block text-sm font-medium text-[#333333] mb-2">Full Name</label>
                 <input
                   type="text"
-                  className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#E30613]"
+                  className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#FF000E]"
                   placeholder="Your full name"
                 />
               </div>
@@ -160,7 +160,7 @@ export default function Careers() {
                 <label className="block text-sm font-medium text-[#333333] mb-2">Email</label>
                 <input
                   type="email"
-                  className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#E30613]"
+                  className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#FF000E]"
                   placeholder="your.email@example.com"
                 />
               </div>
@@ -168,7 +168,7 @@ export default function Careers() {
                 <label className="block text-sm font-medium text-[#333333] mb-2">
                   Interested Role
                 </label>
-                <select className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#E30613]">
+                <select className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#FF000E]">
                   <option>Select a role</option>
                   <option>Full Stack Developer</option>
                   <option>Backend Developer</option>
@@ -184,7 +184,7 @@ export default function Careers() {
                 </label>
                 <input
                   type="text"
-                  className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#E30613]"
+                  className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#FF000E]"
                   placeholder="Link to your resume or LinkedIn profile"
                 />
               </div>
@@ -192,7 +192,7 @@ export default function Careers() {
                 <label className="block text-sm font-medium text-[#333333] mb-2">Message</label>
                 <textarea
                   rows={4}
-                  className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#E30613]"
+                  className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#FF000E]"
                   placeholder="Tell us about yourself and your experience"
                 ></textarea>
               </div>

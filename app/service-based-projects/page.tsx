@@ -72,7 +72,7 @@ export default function ServiceBasedProjects() {
                 ].map((item, idx) => (
                   <li key={idx} className="flex items-start">
                     <svg
-                      className="w-6 h-6 text-[#E30613] mr-3 mt-1 flex-shrink-0"
+                      className="w-6 h-6 text-[#FF000E] mr-3 mt-1 flex-shrink-0"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -87,7 +87,7 @@ export default function ServiceBasedProjects() {
                 ))}
               </ul>
             </div>
-            <div className="bg-gradient-to-br from-[#E30613] to-[#C00510] h-[400px] rounded-lg shadow-xl"></div>
+            <div className="bg-gradient-to-br from-[#FF000E] to-[#9E0008] h-[400px] rounded-lg shadow-xl"></div>
           </div>
         </div>
       </section>
@@ -107,7 +107,7 @@ export default function ServiceBasedProjects() {
                 <div className="text-5xl mb-4">{model.icon}</div>
                 <h3 className="text-xl font-semibold text-black mb-3">{model.title}</h3>
                 <p className="text-[#333333] mb-4 leading-relaxed">{model.description}</p>
-                <p className="text-sm text-[#E30613] font-medium">Best for: {model.bestFor}</p>
+                <p className="text-sm text-[#FF000E] font-medium">Best for: {model.bestFor}</p>
               </Card>
             ))}
           </div>
