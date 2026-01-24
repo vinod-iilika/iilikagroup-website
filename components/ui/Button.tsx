@@ -13,7 +13,7 @@ export default function Button({
   className = "",
   ...props
 }: ButtonProps) {
-  const baseStyles = "font-semibold rounded transition-all duration-200 inline-block text-center";
+  const baseStyles = "font-semibold rounded transition-all duration-200 inline-block text-center disabled:opacity-50 disabled:cursor-not-allowed";
 
   const variantStyles = {
     primary: "bg-[#FF000E] text-white hover:bg-[#9E0008]",

@@ -2,39 +2,42 @@
 
 import { useState, useEffect } from "react";
 import Card from "./ui/Card";
+import { createClient } from "@/lib/supabase";
 
 interface Testimonial {
-  id: number;
+  id: string;
   client_name: string;
   quote: string;
   company?: string;
   position?: string;
+  logo_url?: string;
 }
 
-const testimonials: Testimonial[] = [
+// Fallback testimonials if database is empty
+const fallbackTestimonials: Testimonial[] = [
   {
-    id: 1,
+    id: "1",
     client_name: "Rajesh Kumar",
     quote: "IILIKA GROUPS helped us build our GCC in Pune with exceptional talent. Their end-to-end support made the entire process seamless.",
     company: "Global Tech Corp",
     position: "VP Engineering",
   },
   {
-    id: 2,
+    id: "2",
     client_name: "Sarah Johnson",
     quote: "The deployed resources from IILIKA have been instrumental in scaling our development team. Professional, skilled, and committed.",
     company: "FinTech Solutions",
     position: "CTO",
   },
   {
-    id: 3,
+    id: "3",
     client_name: "Amit Patel",
     quote: "Outstanding project delivery! Their managed squads delivered our mobile app ahead of schedule with excellent quality.",
     company: "Retail Innovations",
     position: "Head of Product",
   },
   {
-    id: 4,
+    id: "4",
     client_name: "Lisa Chen",
     quote: "IILIKA's staffing services are top-notch. They understand our technical requirements and consistently deliver the right talent.",
     company: "Cloud Systems Inc",
@@ -43,18 +46,38 @@ const testimonials: Testimonial[] = [
 ];
 
 export default function TestimonialsCarousel() {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(fallbackTestimonials);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
+  const supabase = createClient();
+
+  // Fetch testimonials from Supabase
   useEffect(() => {
-    if (!isAutoPlaying) return;
+    async function fetchTestimonials() {
+      const { data, error } = await supabase
+        .from("testimonials")
+        .select("id, client_name, quote, company, position, logo_url")
+        .eq("status", "active")
+        .order("display_order");
+
+      if (!error && data && data.length > 0) {
+        setTestimonials(data);
+      }
+    }
+    fetchTestimonials();
+  }, []);
+
+  // Auto-play carousel
+  useEffect(() => {
+    if (!isAutoPlaying || testimonials.length === 0) return;
 
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [isAutoPlaying]);
+  }, [isAutoPlaying, testimonials.length]);
 
   const goToSlide = (index: number) => {
     setCurrentIndex(index);
