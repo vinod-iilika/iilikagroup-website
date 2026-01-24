@@ -1,17 +1,17 @@
-```markdown
-# 🎯 IILIKA GROUPS Website Master Development Plan
+# IILIKA GROUPS Website Master Development Plan
 
-## 📋 Project Overview
-**Company**: IILIKA GROUPS (iilikagroups.com)  
-**Positioning**: IT Staffing + GCC Enablement + Service-based Project Delivery  
-**Location**: Lohegaon, Pune, India  
-**Tech Stack**: React + TypeScript + Tailwind + Supabase + Vercel  
-**Design Inspiration**: ABB.com (clean industrial B2B design)  
-**Current State**: Single landing page → Full multi-page B2B lead gen site  
+## Project Overview
+
+**Company**: IILIKA GROUPS (iilikagroups.com)
+**Positioning**: IT Staffing + GCC Enablement + Service-based Project Delivery
+**Location**: Lohegaon, Pune, India
+**Tech Stack**: React + TypeScript + Tailwind + Supabase + Vercel
+**Design Inspiration**: ABB.com (clean industrial B2B design)
+**Current State**: Frontend base complete → Backend + Admin Panel
 
 ---
 
-## 🎨 Design System (4 Colors Only)
+## Design System (4 Colors Only)
 
 | Color | HEX | Usage |
 |-------|-----|-------|
@@ -20,9 +20,9 @@
 | **Black** | `#000000` | Body text, headlines |
 | **White** | `#FFFFFF` | Backgrounds, cards |
 
-**Typography**: Modern sans-serif (Inter/Source Sans 3/IBM Plex Sans)
+**Typography**: Montserrat (Primary), fallback to system sans-serif
 - H1: 44–56px bold
-- H2: 28–32px semi-bold  
+- H2: 28–32px semi-bold
 - H3: 20–22px
 - Body: 16–18px (150–170% line height)
 
@@ -30,46 +30,56 @@
 
 ---
 
-## 🏗️ Page Structure (7 Core Pages)
+## Page Structure (7 Core Pages)
 
 | Page | Purpose | Key Features |
 |------|---------|-------------|
-| **Home** | Overview + teasers | Hero (video), 3 pillars, testimonials, case studies teaser |
-| **About** | Credibility | Story, experience, values, locations |
+| **Home** | Overview + teasers | Hero (video), 3 pillars, testimonials, case studies teaser, featured products |
+| **About** | Credibility | Story, team members, values, locations, partner logos |
 | **Services** | Service overview | 3 pillars → GCC/Projects pages |
 | **GCC Enablement** | GCC deep dive | Setup process, models, metrics |
 | **Service-based Projects** | Project delivery | Engagement models, tech stacks |
-| **Careers** | Job openings | Dynamic Supabase openings + single form |
+| **Careers** | Job openings | Dynamic Supabase openings + single form (Phase 2) |
 | **Contact** | Dual audience | Toggle: Client form / Applicant form |
+
+**Additional Pages**:
+- `/products` - Product showcase listing
+- `/products/[slug]` - Individual product pages
+- `/insights` - Blog/articles listing
+- `/insights/[slug]` - Individual blog posts
+- `/case-studies` - Case studies listing
+- `/case-studies/[slug]` - Individual case study pages
+- `/admin` - Admin dashboard (protected)
 
 **Navigation**: Home, About, Services, GCC, Projects, Careers, Contact
 
 ---
 
-## 🚀 Hero Section (Keep Video)
+## Hero Section
+
 ```
 Layout: Video (right) + Text block (left on white)
 Headline: "Building teams and GCCs that deliver."
 Sub: "Staffing, GCC enablement, project delivery for modern enterprises."
 Bullets:
--  Deployed staffing & IT hiring
--  GCC setup & scaling  
--  Project-based delivery
+- Deployed staffing & IT hiring
+- GCC setup & scaling
+- Project-based delivery
 CTA: Red "Explore services"
 ```
 
 ---
 
-## 💼 Service Pillars (3 Core Offerings)
+## Service Pillars (3 Core Offerings)
 
 1. **Staffing & Deployed Resources**
    - Onsite/hybrid/remote engineers
    - Permanent + contract IT hiring
-   
+
 2. **GCC Enablement**
    - GCC setup (talent + infra partners)
    - Scale & transition support
-   
+
 3. **Service-based Project Delivery**
    - Project ownership (like TechM/Wipro)
    - Managed squads/pods
@@ -77,96 +87,233 @@ CTA: Red "Explore services"
 
 ---
 
-## 🛠️ Supabase Backend Schema
+## Supabase Backend Schema
 
-### Core Tables
-```sql
-services (slug, title, description, category)
-careers_openings (title, slug, location, experience, tech_stack[], status)
-```
+### Phase 1 Tables (Current Focus)
 
-### Priority Features Tables
-```sql
-testimonials (client_name, quote, logo_url, status)
-case_studies (slug, title, challenge, solution, results[], status)
-insights (slug, title, content, category, status)
-```
+#### Content Tables (Admin CRUD)
+| Table | Purpose | Status Values |
+|-------|---------|---------------|
+| `services` | 3 pillars + sub-services | draft, active, archived |
+| `products` | Tech/client/partner products | draft, active, archived |
+| `insights` | Blog articles (markdown) | draft, published, archived |
+| `case_studies` | Client success stories | draft, published, archived |
+| `testimonials` | Client quotes carousel | draft, active, archived |
+| `team_members` | About page + blog authors | draft, active, archived |
+| `partner_logos` | Trust badges/logo strip | active, archived |
 
-**RLS**: Public read (active/published), admin write.
+#### Submission Tables (Read + Status Update in Admin)
+| Table | Purpose | Status Values |
+|-------|---------|---------------|
+| `client_inquiries` | Contact form - client tab | new, contacted, qualified, closed |
+| `general_applications` | Contact form - applicant tab | new, reviewed, shortlisted, closed |
+
+#### System Tables
+| Table | Purpose |
+|-------|---------|
+| `admin_profiles` | Admin user info + roles (linked to auth.users) |
+
+### Phase 2 Tables (Deferred)
+| Table | Purpose | Notes |
+|-------|---------|-------|
+| `careers_openings` | Job listings | Needs workflow design |
+| `job_applications` | Applications per job | Linked to careers_openings |
+
+### Key Schema Features
+- **Services hierarchy**: Type field (pillar/offering) with parent_id for sub-services
+- **Products**: Three types - internal (our products), client (delivered), partner (tools we use)
+- **Insights author**: Foreign key to team_members (not free text)
+- **SEO fields**: seo_title, seo_description, seo_keywords[] on content pages
+- **Featured flag**: On products, case_studies, insights for homepage highlights
+- **Soft delete**: Using status = 'archived' (recoverable) + hard delete option
+
+### RLS Policies
+- **Public read**: Only active/published content
+- **Public write**: client_inquiries and general_applications (insert only)
+- **Admin read**: All content regardless of status
+- **Admin write**: Full CRUD on all tables
+
+### Storage Buckets
+| Bucket | Purpose |
+|--------|---------|
+| `logos` | Partner/company logos |
+| `team` | Team member photos |
+| `products` | Product screenshots |
+| `insights` | Blog cover images |
+| `case-studies` | Case study thumbnails |
+
+**Note**: Resume uploads deferred to Phase 2 (1GB free tier limit). Applicants provide LinkedIn URL instead.
 
 ---
 
-## ✨ Priority Features (4 Selected)
+## Admin Dashboard (/admin)
 
-### 1. Testimonials Carousel (Week 1)
-- Home + Services pages
-- Auto-scrolling ABB-style cards
+### Phase 1 Features
+- **Authentication**: Supabase Auth (email/password)
+- **Roles**: super_admin, admin (HR, Sales roles in Phase 2)
+- **Content Management**:
+  - Services (pillars + offerings)
+  - Products (CRUD + featured toggle)
+  - Insights/Blog (markdown editor)
+  - Case Studies (challenge/solution/results)
+  - Testimonials (quotes + ordering)
+  - Team Members (bios + author flag)
+  - Partner Logos (logo carousel management)
+- **Submissions** (read-only with status update):
+  - Client Inquiries (with admin notes)
+  - General Applications (with admin notes)
+- **Storage Management**:
+  - View uploaded files
+  - Orphan file cleanup (manual action)
 
-### 2. Case Studies (Week 2)
-- `/case-studies` + Home teasers
-- Challenge → Solution → Results format
-
-### 3. Insights Blog (Week 3)
-- `/insights` + category filters
-- GCC trends, staffing tips, tech insights
-
-### 4. Quick Quote Calculator (Week 4)
-- Client-side JS: #roles × duration × seniority
-- "Get exact quote" → prefilled form
+### Phase 2 Features (Deferred)
+- Career openings management
+- Job applications workflow
+- RBAC (HR sees only careers, Sales sees only inquiries)
+- Email notifications (Brevo/SMTP)
 
 ---
 
-## 📱 Forms Strategy
+## Forms Strategy
 
-**Contact Page** (toggleable):
+### Contact Page (toggleable tabs)
 ```
 [For Clients] [For Applicants]
-Client: Company, Service type, Message
-Applicant: Name, Role, LinkedIn/CV, Message
+
+Client Form:
+- Company name
+- Contact name
+- Email, Phone
+- Service interest (dropdown: Staffing, GCC, Projects, General Inquiry)
+- Message
+
+Applicant Form:
+- Name
+- Email, Phone
+- LinkedIn URL
+- Role interest (free text)
+- Message
 ```
 
-**Careers Page** (single form):
+### Careers Page (Phase 2)
 ```
-Name, Email, Interested role (dropdown), CV upload
+- Name, Email
+- Interested role (dropdown from active openings)
+- LinkedIn URL
+- Message
 ```
 
 ---
 
-## 🧪 Implementation Roadmap (4 Weeks)
+## SEO Strategy
 
-| Week | Deliverables | Supabase | Pages |
-|------|-------------|----------|-------|
-| **1** | Core 7 pages + Testimonials | `testimonials` | All |
-| **2** | Services/GCC/Projects + Case Studies | `case_studies` | Services subpages |
-| **3** | Careers (dynamic) + Insights | `careers_openings`, `insights` | Careers, `/insights` |
-| **4** | Quote calculator + Admin CMS | None | Home/Services |
+### Per-page SEO Fields
+- `seo_title` - Custom title tag (falls back to title)
+- `seo_description` - Meta description (150-160 chars)
+- `seo_keywords[]` - Array for JSON-LD schema
 
----
-
-## ⚙️ Admin Dashboard (/admin)
-- Manage: Services, Careers openings, Case studies, Testimonials, Insights
-- CRUD + status toggle (active/published/draft)
+### Applied To
+- Services (pillars and offerings)
+- Products
+- Insights/Blog posts
+- Case Studies
 
 ---
 
-## 🎯 Success Metrics
-- [ ] 7 pages live
-- [ ] Dynamic careers (5+ openings)
-- [ ] 3 case studies
-- [ ] 8 testimonials
-- [ ] 5 insights posts
-- [ ] Quote calculator generating leads
-- [ ] Forms capturing client/applicant leads
+## Implementation Roadmap
+
+### Phase 1: Backend + Admin (Current)
+| Task | Tables | Priority |
+|------|--------|----------|
+| Supabase schema setup | All Phase 1 tables | High |
+| RLS policies | All tables | High |
+| Storage buckets | 5 buckets | High |
+| Admin authentication | admin_profiles | High |
+| Admin CRUD - Content | services, products, insights, case_studies, testimonials, team_members, partner_logos | High |
+| Admin - Submissions | client_inquiries, general_applications | Medium |
+| Storage management UI | Orphan cleanup | Medium |
+
+### Phase 2: Careers + RBAC
+| Task | Tables | Priority |
+|------|--------|----------|
+| Careers schema design | careers_openings, job_applications | High |
+| Application workflow | Status transitions, notifications | Medium |
+| RBAC implementation | Role-based access | Medium |
+| Email notifications | Brevo/SMTP integration | Low |
+
+### Phase 3: Enhancements
+| Task | Notes |
+|------|-------|
+| Quick Quote Calculator | Client-side estimation → prefilled form |
+| Analytics dashboard | Inquiry/application metrics |
+| Bulk operations | Multi-select actions in admin |
 
 ---
 
-## 📝 Next Immediate Actions
-1. **Create Supabase tables** (services, careers_openings, testimonials)
-2. **Build Hero component** (video + ABB copy)
-3. **Testimonials carousel** (Priority #1)
-4. **Careers page** (dynamic from Supabase)
+## Success Metrics
 
-**Copy this entire plan to your project README.md**
+### Phase 1 Completion
+- [ ] All 10 Phase 1 tables created with RLS
+- [ ] Admin login working
+- [ ] CRUD for all content types
+- [ ] Submissions viewable in admin
+- [ ] 3 service pillars seeded
+- [ ] Storage buckets configured
+
+### Content Goals
+- [ ] 3 case studies published
+- [ ] 8 testimonials active
+- [ ] 5 insights/blog posts
+- [ ] Team members added
+- [ ] Partner logos uploaded
+
+### Lead Generation
+- [ ] Contact forms capturing inquiries
+- [ ] Admin can update submission status
+- [ ] Admin notes on each submission
+
+---
+
+## File Structure
+
+```
+/supabase
+  └── supabase-schema.sql     # Complete SQL schema
+/docs
+  ├── masterprompt.md         # This file
+  └── SUPABASE_SETUP.md       # Setup guide
+/src
+  ├── lib/
+  │   └── supabase.ts         # Supabase client
+  ├── types/
+  │   └── database.ts         # Generated types
+  └── app/
+      └── admin/              # Admin panel routes
 ```
 
-This master plan captures **everything** from our discussion: colors, pages, services, Supabase schema, features, roadmap. Copy-paste it directly into your GitHub repo README and start building from Hero → Testimonials → Careers. [perplexity](https://www.perplexity.ai/hub/blog/building-safer-ai-browsers-with-browsesafe)
+---
+
+## Quick Reference
+
+### Status Values by Table
+| Table | Status Options |
+|-------|---------------|
+| services, products, testimonials, team_members | draft → active → archived |
+| insights, case_studies | draft → published → archived |
+| partner_logos | active → archived |
+| client_inquiries | new → contacted → qualified → closed |
+| general_applications | new → reviewed → shortlisted → closed |
+
+### Service Types
+- `pillar` - Top-level (Staffing, GCC, Projects)
+- `offering` - Sub-service under a pillar
+
+### Product Types
+- `internal` - IILIKA's own products
+- `client` - Delivered for clients
+- `partner` - Partner tools we use/promote
+
+### Partner Logo Types
+- `client` - Client company logos
+- `partner` - Partner/vendor logos
+- `technology` - Tech stack logos
