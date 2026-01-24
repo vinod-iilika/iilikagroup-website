@@ -66,7 +66,7 @@ export default function GCCEnablement() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {setupProcess.map((phase, index) => (
               <Card key={index} className="relative">
-                <div className="text-5xl font-bold text-[#E30613] mb-4 opacity-20">{phase.step}</div>
+                <div className="text-5xl font-bold text-[#FF000E] mb-4 opacity-20">{phase.step}</div>
                 <h3 className="text-xl font-semibold text-black mb-3">{phase.title}</h3>
                 <p className="text-[#333333] leading-relaxed">{phase.description}</p>
               </Card>
@@ -109,7 +109,7 @@ export default function GCCEnablement() {
               { metric: "10+", label: "GCCs Enabled" },
             ].map((item, index) => (
               <Card key={index} className="text-center">
-                <div className="text-4xl font-bold text-[#E30613] mb-2">{item.metric}</div>
+                <div className="text-4xl font-bold text-[#FF000E] mb-2">{item.metric}</div>
                 <div className="text-[#333333] font-medium">{item.label}</div>
               </Card>
             ))}

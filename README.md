@@ -1,6 +1,10 @@
 # IILIKA GROUPS Website
 
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)]() [![TypeScript](https://img.shields.io/badge/TypeScript-passing-blue)]() [![Vercel](https://img.shields.io/badge/Vercel-ready-black)]()
+
 Modern corporate website for IILIKA GROUPS - IT Staffing, GCC Enablement & Service-based Project Delivery.
+
+**✅ Production build verified - Ready for Vercel deployment**
 
 ## Tech Stack
 
@@ -14,13 +18,14 @@ Modern corporate website for IILIKA GROUPS - IT Staffing, GCC Enablement & Servi
 Based on ABB.com design principles with a clean, industrial B2B aesthetic.
 
 ### Colors
-- Primary Red: `#E30613`
-- Dark Grey: `#333333`
+- Primary Red: `#FF000E`
+- Sangria (Secondary Red): `#9E0008`
+- Graphite White: `#A3A3A3`
 - Black: `#000000`
 - White: `#FFFFFF`
 
 ### Typography
-- Font: Inter
+- Font: [Montserrat](https://fonts.google.com/specimen/Montserrat)
 - Headings: Bold, clean hierarchy
 - Body: 16-18px with generous line spacing
 

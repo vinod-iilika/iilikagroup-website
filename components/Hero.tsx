@@ -21,7 +21,7 @@ export default function Hero() {
               ].map((item, index) => (
                 <li key={index} className="flex items-start">
                   <svg
-                    className="w-6 h-6 text-[#E30613] mr-3 mt-1 flex-shrink-0"
+                    className="w-6 h-6 text-[#FF000E] mr-3 mt-1 flex-shrink-0"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -44,7 +44,7 @@ export default function Hero() {
             </div>
           </div>
 
-          <div className="relative h-[400px] lg:h-[500px] bg-gradient-to-br from-[#E30613] to-[#C00510] rounded-lg overflow-hidden shadow-xl">
+          <div className="relative h-[400px] lg:h-[500px] bg-gradient-to-br from-[#FF000E] to-[#9E0008] rounded-lg overflow-hidden shadow-xl">
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center text-white p-8">
                 <svg

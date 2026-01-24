@@ -29,7 +29,7 @@ export default function Contact() {
                   onClick={() => setFormType("client")}
                   className={`px-6 py-2 rounded-md font-medium transition-all ${
                     formType === "client"
-                      ? "bg-[#E30613] text-white"
+                      ? "bg-[#FF000E] text-white"
                       : "text-[#333333] hover:bg-gray-100"
                   }`}
                 >
@@ -39,7 +39,7 @@ export default function Contact() {
                   onClick={() => setFormType("applicant")}
                   className={`px-6 py-2 rounded-md font-medium transition-all ${
                     formType === "applicant"
-                      ? "bg-[#E30613] text-white"
+                      ? "bg-[#FF000E] text-white"
                       : "text-[#333333] hover:bg-gray-100"
                   }`}
                 >
@@ -66,7 +66,7 @@ export default function Contact() {
                         </label>
                         <input
                           type="text"
-                          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#E30613]"
+                          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#FF000E]"
                           placeholder="Your name"
                         />
                       </div>
@@ -76,7 +76,7 @@ export default function Contact() {
                         </label>
                         <input
                           type="text"
-                          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#E30613]"
+                          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#FF000E]"
                           placeholder="Your company"
                         />
                       </div>
@@ -88,7 +88,7 @@ export default function Contact() {
                         </label>
                         <input
                           type="email"
-                          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#E30613]"
+                          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#FF000E]"
                           placeholder="your.email@company.com"
                         />
                       </div>
@@ -98,7 +98,7 @@ export default function Contact() {
                         </label>
                         <input
                           type="tel"
-                          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#E30613]"
+                          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#FF000E]"
                           placeholder="+91 XXXXX XXXXX"
                         />
                       </div>
@@ -107,7 +107,7 @@ export default function Contact() {
                       <label className="block text-sm font-medium text-[#333333] mb-2">
                         Service Type
                       </label>
-                      <select className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#E30613]">
+                      <select className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#FF000E]">
                         <option>Select a service</option>
                         <option>IT Staffing & Deployed Resources</option>
                         <option>GCC Enablement</option>
@@ -121,7 +121,7 @@ export default function Contact() {
                       </label>
                       <textarea
                         rows={5}
-                        className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#E30613]"
+                        className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#FF000E]"
                         placeholder="Tell us about your requirements..."
                       ></textarea>
                     </div>
@@ -147,7 +147,7 @@ export default function Contact() {
                         </label>
                         <input
                           type="text"
-                          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#E30613]"
+                          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#FF000E]"
                           placeholder="Your name"
                         />
                       </div>
@@ -157,7 +157,7 @@ export default function Contact() {
                         </label>
                         <input
                           type="email"
-                          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#E30613]"
+                          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#FF000E]"
                           placeholder="your.email@example.com"
                         />
                       </div>
@@ -169,7 +169,7 @@ export default function Contact() {
                         </label>
                         <input
                           type="tel"
-                          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#E30613]"
+                          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#FF000E]"
                           placeholder="+91 XXXXX XXXXX"
                         />
                       </div>
@@ -177,7 +177,7 @@ export default function Contact() {
                         <label className="block text-sm font-medium text-[#333333] mb-2">
                           Role Interested In
                         </label>
-                        <select className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#E30613]">
+                        <select className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#FF000E]">
                           <option>Select a role</option>
                           <option>Full Stack Developer</option>
                           <option>Backend Developer</option>
@@ -194,7 +194,7 @@ export default function Contact() {
                       </label>
                       <input
                         type="text"
-                        className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#E30613]"
+                        className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#FF000E]"
                         placeholder="https://linkedin.com/in/yourprofile"
                       />
                     </div>
@@ -204,7 +204,7 @@ export default function Contact() {
                       </label>
                       <textarea
                         rows={5}
-                        className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#E30613]"
+                        className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#FF000E]"
                         placeholder="Tell us about your experience and why you want to join IILIKA GROUPS..."
                       ></textarea>
                     </div>
@@ -228,7 +228,7 @@ export default function Contact() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <Card className="text-center">
               <svg
-                className="w-12 h-12 text-[#E30613] mx-auto mb-4"
+                className="w-12 h-12 text-[#FF000E] mx-auto mb-4"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -243,7 +243,7 @@ export default function Contact() {
             </Card>
             <Card className="text-center">
               <svg
-                className="w-12 h-12 text-[#E30613] mx-auto mb-4"
+                className="w-12 h-12 text-[#FF000E] mx-auto mb-4"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -251,13 +251,13 @@ export default function Contact() {
                 <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
               </svg>
               <h3 className="font-semibold text-black mb-2">Email</h3>
-              <a href="mailto:info@iilikagroups.com" className="text-[#E30613] text-sm hover:underline">
+              <a href="mailto:info@iilikagroups.com" className="text-[#FF000E] text-sm hover:underline">
                 info@iilikagroups.com
               </a>
             </Card>
             <Card className="text-center">
               <svg
-                className="w-12 h-12 text-[#E30613] mx-auto mb-4"
+                className="w-12 h-12 text-[#FF000E] mx-auto mb-4"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >

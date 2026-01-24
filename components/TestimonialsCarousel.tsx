@@ -84,7 +84,7 @@ export default function TestimonialsCarousel() {
             <div key={testimonial.id} className="w-full flex-shrink-0 px-4">
               <Card className="max-w-4xl mx-auto text-center">
                 <svg
-                  className="w-12 h-12 text-[#E30613] mx-auto mb-6 opacity-50"
+                  className="w-12 h-12 text-[#FF000E] mx-auto mb-6 opacity-50"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
@@ -133,7 +133,7 @@ export default function TestimonialsCarousel() {
             key={index}
             onClick={() => goToSlide(index)}
             className={`w-3 h-3 rounded-full transition-all ${
-              index === currentIndex ? "bg-[#E30613] w-8" : "bg-gray-300"
+              index === currentIndex ? "bg-[#FF000E] w-8" : "bg-gray-300"
             }`}
             aria-label={`Go to testimonial ${index + 1}`}
           />
