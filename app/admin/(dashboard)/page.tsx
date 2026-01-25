@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
+import { useAuth } from '@/lib/auth-context'
 import Link from 'next/link'
 
 interface DashboardStats {
@@ -29,12 +30,10 @@ export default function AdminDashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [recentSubmissions, setRecentSubmissions] = useState<RecentSubmission[]>([])
   const [loading, setLoading] = useState(true)
-  const [refreshing, setRefreshing] = useState(false)
+  const { user, loading: authLoading } = useAuth()
 
-  const fetchData = useCallback(async (isRefresh = false) => {
-    if (isRefresh) setRefreshing(true)
-    else setLoading(true)
-
+  const fetchData = async () => {
+    setLoading(true)
     const supabase = createClient()
 
     // Fetch counts for all tables
@@ -109,12 +108,13 @@ export default function AdminDashboardPage() {
 
     setRecentSubmissions(combined)
     setLoading(false)
-    setRefreshing(false)
-  }, [])
+  }
 
   useEffect(() => {
-    fetchData()
-  }, [fetchData])
+    if (!authLoading && user) {
+      fetchData()
+    }
+  }, [authLoading, user])
 
   if (loading) {
     return (
@@ -143,12 +143,12 @@ export default function AdminDashboardPage() {
           <p className="text-gray-600">Welcome to the IILIKA GROUPS admin panel</p>
         </div>
         <button
-          onClick={() => fetchData(true)}
-          disabled={refreshing}
+          onClick={fetchData}
+          disabled={loading}
           className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
         >
           <svg
-            className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`}
+            className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -160,7 +160,7 @@ export default function AdminDashboardPage() {
               d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
             />
           </svg>
-          {refreshing ? 'Refreshing...' : 'Refresh'}
+          {loading ? 'Loading...' : 'Refresh'}
         </button>
       </div>
 
