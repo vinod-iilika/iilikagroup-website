@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { Input, Select } from '@/components/admin/FormFields'
 import ImageUpload from '@/components/admin/ImageUpload'
+import { useAuth } from '@/lib/auth-context'
 
 interface PartnerLogoForm {
   company_name: string
@@ -29,35 +30,47 @@ export default function PartnerLogoEditPage() {
   const router = useRouter()
   const params = useParams()
   const isNew = params.id === 'new'
+  const { user, loading: authLoading } = useAuth()
 
   const [form, setForm] = useState<PartnerLogoForm>(initialForm)
   const [loading, setLoading] = useState(!isNew)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (!isNew) fetchPartnerLogo()
-  }, [isNew, params.id])
+  const fetchPartnerLogo = useCallback(async () => {
+    if (!user) return
 
-  const fetchPartnerLogo = async () => {
-    const supabase = createClient()
-    const { data, error } = await supabase.from('partner_logos').select('*').eq('id', params.id).single()
+    setLoading(true)
+    try {
+      const supabase = createClient()
+      const { data, error: fetchError } = await supabase.from('partner_logos').select('*').eq('id', params.id).single()
 
-    if (error || !data) {
-      router.push('/admin/partners')
-      return
+      if (fetchError || !data) {
+        router.push('/admin/partners')
+        return
+      }
+
+      setForm({
+        company_name: data.company_name,
+        logo_url: data.logo_url,
+        website_url: data.website_url || '',
+        type: data.type,
+        display_order: data.display_order,
+        status: data.status,
+      })
+    } catch (err) {
+      console.error('Error fetching partner logo:', err)
+      setError('Failed to load partner logo')
+    } finally {
+      setLoading(false)
     }
+  }, [user, params.id, router])
 
-    setForm({
-      company_name: data.company_name,
-      logo_url: data.logo_url,
-      website_url: data.website_url || '',
-      type: data.type,
-      display_order: data.display_order,
-      status: data.status,
-    })
-    setLoading(false)
-  }
+  useEffect(() => {
+    if (!authLoading && user && !isNew) {
+      fetchPartnerLogo()
+    }
+  }, [authLoading, user, isNew, fetchPartnerLogo])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

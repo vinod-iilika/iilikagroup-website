@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, Suspense } from 'react'
+import { useState, Suspense, useEffect, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 
@@ -14,28 +14,47 @@ function LoginForm() {
 
   const unauthorizedError = searchParams.get('error') === 'unauthorized'
 
-  const handleLogin = async (e: React.FormEvent) => {
+  // Auto-clear error after 5 seconds
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError('')
+      }, 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [error])
+
+  const handleLogin = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // Prevent multiple submissions
+    if (loading) return
+
     setError('')
     setLoading(true)
 
-    const supabase = createClient()
+    try {
+      const supabase = createClient()
 
-    const { error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
-    if (authError) {
-      setError(authError.message)
+      if (authError) {
+        setError(authError.message)
+        setLoading(false)
+        return
+      }
+
+      // Successful login - middleware will handle admin check
+      router.push('/admin')
+      router.refresh()
+    } catch (err) {
+      setError('An unexpected error occurred. Please try again.')
       setLoading(false)
-      return
     }
-
-    // Successful login - middleware will handle admin check
-    router.push('/admin')
-    router.refresh()
-  }
+  }, [email, password, loading, router])
 
   return (
     <div className="bg-white rounded-lg shadow-md p-8">
@@ -53,8 +72,17 @@ function LoginForm() {
       )}
 
       {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
-          {error}
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm flex items-center justify-between">
+          <span>{error}</span>
+          <button
+            type="button"
+            onClick={() => setError('')}
+            className="ml-2 text-red-500 hover:text-red-700"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
       )}
 

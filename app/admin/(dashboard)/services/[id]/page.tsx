@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { Input, Textarea, Select, TagInput } from '@/components/admin/FormFields'
+import { useAuth } from '@/lib/auth-context'
 
 interface ServiceForm {
   slug: string
@@ -40,6 +41,7 @@ export default function ServiceEditPage() {
   const router = useRouter()
   const params = useParams()
   const isNew = params.id === 'new'
+  const { user, loading: authLoading } = useAuth()
 
   const [form, setForm] = useState<ServiceForm>(initialForm)
   const [pillars, setPillars] = useState<{ id: string; title: string }[]>([])
@@ -47,52 +49,68 @@ export default function ServiceEditPage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const fetchPillars = useCallback(async () => {
+    if (!user) return
+    try {
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('services')
+        .select('id, title')
+        .eq('type', 'pillar')
+        .order('display_order')
+      setPillars(data || [])
+    } catch (err) {
+      console.error('Error fetching pillars:', err)
+    }
+  }, [user])
+
+  const fetchService = useCallback(async () => {
+    if (!user) return
+
+    setLoading(true)
+    try {
+      const supabase = createClient()
+      const { data, error: fetchError } = await supabase
+        .from('services')
+        .select('*')
+        .eq('id', params.id)
+        .single()
+
+      if (fetchError || !data) {
+        router.push('/admin/services')
+        return
+      }
+
+      setForm({
+        slug: data.slug,
+        title: data.title,
+        description: data.description || '',
+        type: data.type,
+        parent_id: data.parent_id,
+        icon_name: data.icon_name || '',
+        icon_url: data.icon_url || '',
+        display_order: data.display_order,
+        status: data.status,
+        seo_title: data.seo_title || '',
+        seo_description: data.seo_description || '',
+        seo_keywords: data.seo_keywords || [],
+      })
+    } catch (err) {
+      console.error('Error fetching service:', err)
+      setError('Failed to load service')
+    } finally {
+      setLoading(false)
+    }
+  }, [user, params.id, router])
+
   useEffect(() => {
-    fetchPillars()
-    if (!isNew) {
-      fetchService()
+    if (!authLoading && user) {
+      fetchPillars()
+      if (!isNew) {
+        fetchService()
+      }
     }
-  }, [isNew, params.id])
-
-  const fetchPillars = async () => {
-    const supabase = createClient()
-    const { data } = await supabase
-      .from('services')
-      .select('id, title')
-      .eq('type', 'pillar')
-      .order('display_order')
-    setPillars(data || [])
-  }
-
-  const fetchService = async () => {
-    const supabase = createClient()
-    const { data, error } = await supabase
-      .from('services')
-      .select('*')
-      .eq('id', params.id)
-      .single()
-
-    if (error || !data) {
-      router.push('/admin/services')
-      return
-    }
-
-    setForm({
-      slug: data.slug,
-      title: data.title,
-      description: data.description || '',
-      type: data.type,
-      parent_id: data.parent_id,
-      icon_name: data.icon_name || '',
-      icon_url: data.icon_url || '',
-      display_order: data.display_order,
-      status: data.status,
-      seo_title: data.seo_title || '',
-      seo_description: data.seo_description || '',
-      seo_keywords: data.seo_keywords || [],
-    })
-    setLoading(false)
-  }
+  }, [authLoading, user, isNew, fetchPillars, fetchService])
 
   const generateSlug = (title: string) => {
     return title

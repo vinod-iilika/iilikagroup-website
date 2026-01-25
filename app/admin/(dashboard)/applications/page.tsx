@@ -20,11 +20,13 @@ interface GeneralApplication {
 export default function ApplicationsPage() {
   const [applications, setApplications] = useState<GeneralApplication[]>([])
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
   const [selectedApp, setSelectedApp] = useState<GeneralApplication | null>(null)
   const [adminNotes, setAdminNotes] = useState('')
   const [saving, setSaving] = useState(false)
 
-  const fetchApplications = async () => {
+  const fetchApplications = async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true)
     const supabase = createClient()
     const { data } = await supabase
       .from('general_applications')
@@ -33,6 +35,7 @@ export default function ApplicationsPage() {
 
     setApplications(data || [])
     setLoading(false)
+    setRefreshing(false)
   }
 
   useEffect(() => {
@@ -72,9 +75,31 @@ export default function ApplicationsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">General Applications</h1>
-        <p className="text-gray-600">Manage general job applications from the contact page</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">General Applications</h1>
+          <p className="text-gray-600">Manage general job applications from the contact page</p>
+        </div>
+        <button
+          onClick={() => fetchApplications(true)}
+          disabled={refreshing}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+        >
+          <svg
+            className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+            />
+          </svg>
+          {refreshing ? 'Refreshing...' : 'Refresh'}
+        </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

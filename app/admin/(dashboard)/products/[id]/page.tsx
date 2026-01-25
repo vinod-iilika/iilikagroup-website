@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { Input, Textarea, Select, TagInput, Checkbox } from '@/components/admin/FormFields'
 import ImageUpload from '@/components/admin/ImageUpload'
+import { useAuth } from '@/lib/auth-context'
 
 interface ProductForm {
   slug: string
@@ -49,45 +50,57 @@ export default function ProductEditPage() {
   const router = useRouter()
   const params = useParams()
   const isNew = params.id === 'new'
+  const { user, loading: authLoading } = useAuth()
 
   const [form, setForm] = useState<ProductForm>(initialForm)
   const [loading, setLoading] = useState(!isNew)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (!isNew) fetchProduct()
-  }, [isNew, params.id])
+  const fetchProduct = useCallback(async () => {
+    if (!user) return
 
-  const fetchProduct = async () => {
-    const supabase = createClient()
-    const { data, error } = await supabase.from('products').select('*').eq('id', params.id).single()
+    setLoading(true)
+    try {
+      const supabase = createClient()
+      const { data, error: fetchError } = await supabase.from('products').select('*').eq('id', params.id).single()
 
-    if (error || !data) {
-      router.push('/admin/products')
-      return
+      if (fetchError || !data) {
+        router.push('/admin/products')
+        return
+      }
+
+      setForm({
+        slug: data.slug,
+        title: data.title,
+        tagline: data.tagline || '',
+        description: data.description || '',
+        type: data.type,
+        client_name: data.client_name || '',
+        features: data.features || [],
+        technologies: data.technologies || [],
+        image_url: data.image_url,
+        external_url: data.external_url || '',
+        display_order: data.display_order,
+        featured: data.featured,
+        status: data.status,
+        seo_title: data.seo_title || '',
+        seo_description: data.seo_description || '',
+        seo_keywords: data.seo_keywords || [],
+      })
+    } catch (err) {
+      console.error('Error fetching product:', err)
+      setError('Failed to load product')
+    } finally {
+      setLoading(false)
     }
+  }, [user, params.id, router])
 
-    setForm({
-      slug: data.slug,
-      title: data.title,
-      tagline: data.tagline || '',
-      description: data.description || '',
-      type: data.type,
-      client_name: data.client_name || '',
-      features: data.features || [],
-      technologies: data.technologies || [],
-      image_url: data.image_url,
-      external_url: data.external_url || '',
-      display_order: data.display_order,
-      featured: data.featured,
-      status: data.status,
-      seo_title: data.seo_title || '',
-      seo_description: data.seo_description || '',
-      seo_keywords: data.seo_keywords || [],
-    })
-    setLoading(false)
-  }
+  useEffect(() => {
+    if (!authLoading && user && !isNew) {
+      fetchProduct()
+    }
+  }, [authLoading, user, isNew, fetchProduct])
 
   const generateSlug = (title: string) => title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 

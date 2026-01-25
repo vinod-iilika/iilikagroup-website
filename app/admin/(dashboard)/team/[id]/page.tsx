@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { Input, Textarea, Select, Checkbox } from '@/components/admin/FormFields'
 import ImageUpload from '@/components/admin/ImageUpload'
+import { useAuth } from '@/lib/auth-context'
 
 interface TeamMemberForm {
   name: string
@@ -37,39 +38,51 @@ export default function TeamMemberEditPage() {
   const router = useRouter()
   const params = useParams()
   const isNew = params.id === 'new'
+  const { user, loading: authLoading } = useAuth()
 
   const [form, setForm] = useState<TeamMemberForm>(initialForm)
   const [loading, setLoading] = useState(!isNew)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (!isNew) fetchTeamMember()
-  }, [isNew, params.id])
+  const fetchTeamMember = useCallback(async () => {
+    if (!user) return
 
-  const fetchTeamMember = async () => {
-    const supabase = createClient()
-    const { data, error } = await supabase.from('team_members').select('*').eq('id', params.id).single()
+    setLoading(true)
+    try {
+      const supabase = createClient()
+      const { data, error: fetchError } = await supabase.from('team_members').select('*').eq('id', params.id).single()
 
-    if (error || !data) {
-      router.push('/admin/team')
-      return
+      if (fetchError || !data) {
+        router.push('/admin/team')
+        return
+      }
+
+      setForm({
+        name: data.name,
+        position: data.position,
+        department: data.department || '',
+        bio: data.bio || '',
+        photo_url: data.photo_url,
+        linkedin_url: data.linkedin_url || '',
+        email: data.email || '',
+        display_order: data.display_order,
+        is_author: data.is_author,
+        status: data.status,
+      })
+    } catch (err) {
+      console.error('Error fetching team member:', err)
+      setError('Failed to load team member')
+    } finally {
+      setLoading(false)
     }
+  }, [user, params.id, router])
 
-    setForm({
-      name: data.name,
-      position: data.position,
-      department: data.department || '',
-      bio: data.bio || '',
-      photo_url: data.photo_url,
-      linkedin_url: data.linkedin_url || '',
-      email: data.email || '',
-      display_order: data.display_order,
-      is_author: data.is_author,
-      status: data.status,
-    })
-    setLoading(false)
-  }
+  useEffect(() => {
+    if (!authLoading && user && !isNew) {
+      fetchTeamMember()
+    }
+  }, [authLoading, user, isNew, fetchTeamMember])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

@@ -4,6 +4,9 @@ import { createServerSupabaseClient } from "@/lib/supabase-server";
 import Image from "next/image";
 import Link from "next/link";
 
+// Disable caching to always fetch fresh data
+export const dynamic = "force-dynamic";
+
 interface Product {
   id: string;
   slug: string;

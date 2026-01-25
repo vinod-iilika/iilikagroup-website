@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase'
 import Link from 'next/link'
 
@@ -29,87 +29,92 @@ export default function AdminDashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [recentSubmissions, setRecentSubmissions] = useState<RecentSubmission[]>([])
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
+
+  const fetchData = useCallback(async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true)
+    else setLoading(true)
+
+    const supabase = createClient()
+
+    // Fetch counts for all tables
+    const [
+      servicesRes,
+      productsRes,
+      insightsRes,
+      caseStudiesRes,
+      testimonialsRes,
+      teamRes,
+      partnersRes,
+      inquiriesRes,
+      applicationsRes,
+    ] = await Promise.all([
+      supabase.from('services').select('id', { count: 'exact', head: true }),
+      supabase.from('products').select('id', { count: 'exact', head: true }),
+      supabase.from('insights').select('id', { count: 'exact', head: true }),
+      supabase.from('case_studies').select('id', { count: 'exact', head: true }),
+      supabase.from('testimonials').select('id', { count: 'exact', head: true }),
+      supabase.from('team_members').select('id', { count: 'exact', head: true }),
+      supabase.from('partner_logos').select('id', { count: 'exact', head: true }),
+      supabase.from('client_inquiries').select('id', { count: 'exact', head: true }).eq('status', 'new'),
+      supabase.from('general_applications').select('id', { count: 'exact', head: true }).eq('status', 'new'),
+    ])
+
+    setStats({
+      services: servicesRes.count || 0,
+      products: productsRes.count || 0,
+      insights: insightsRes.count || 0,
+      caseStudies: caseStudiesRes.count || 0,
+      testimonials: testimonialsRes.count || 0,
+      teamMembers: teamRes.count || 0,
+      partnerLogos: partnersRes.count || 0,
+      newInquiries: inquiriesRes.count || 0,
+      newApplications: applicationsRes.count || 0,
+    })
+
+    // Fetch recent submissions
+    const [recentInquiries, recentApps] = await Promise.all([
+      supabase
+        .from('client_inquiries')
+        .select('id, contact_name, email, created_at, status')
+        .order('created_at', { ascending: false })
+        .limit(5),
+      supabase
+        .from('general_applications')
+        .select('id, name, email, created_at, status')
+        .order('created_at', { ascending: false })
+        .limit(5),
+    ])
+
+    const combined: RecentSubmission[] = [
+      ...(recentInquiries.data || []).map((i) => ({
+        id: i.id,
+        type: 'inquiry' as const,
+        name: i.contact_name,
+        email: i.email,
+        created_at: i.created_at,
+        status: i.status,
+      })),
+      ...(recentApps.data || []).map((a) => ({
+        id: a.id,
+        type: 'application' as const,
+        name: a.name,
+        email: a.email,
+        created_at: a.created_at,
+        status: a.status,
+      })),
+    ]
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .slice(0, 5)
+
+    setRecentSubmissions(combined)
+    setLoading(false)
+    setRefreshing(false)
+  }, [])
 
   useEffect(() => {
-    const fetchData = async () => {
-      const supabase = createClient()
-
-      // Fetch counts for all tables
-      const [
-        servicesRes,
-        productsRes,
-        insightsRes,
-        caseStudiesRes,
-        testimonialsRes,
-        teamRes,
-        partnersRes,
-        inquiriesRes,
-        applicationsRes,
-      ] = await Promise.all([
-        supabase.from('services').select('id', { count: 'exact', head: true }),
-        supabase.from('products').select('id', { count: 'exact', head: true }),
-        supabase.from('insights').select('id', { count: 'exact', head: true }),
-        supabase.from('case_studies').select('id', { count: 'exact', head: true }),
-        supabase.from('testimonials').select('id', { count: 'exact', head: true }),
-        supabase.from('team_members').select('id', { count: 'exact', head: true }),
-        supabase.from('partner_logos').select('id', { count: 'exact', head: true }),
-        supabase.from('client_inquiries').select('id', { count: 'exact', head: true }).eq('status', 'new'),
-        supabase.from('general_applications').select('id', { count: 'exact', head: true }).eq('status', 'new'),
-      ])
-
-      setStats({
-        services: servicesRes.count || 0,
-        products: productsRes.count || 0,
-        insights: insightsRes.count || 0,
-        caseStudies: caseStudiesRes.count || 0,
-        testimonials: testimonialsRes.count || 0,
-        teamMembers: teamRes.count || 0,
-        partnerLogos: partnersRes.count || 0,
-        newInquiries: inquiriesRes.count || 0,
-        newApplications: applicationsRes.count || 0,
-      })
-
-      // Fetch recent submissions
-      const [recentInquiries, recentApps] = await Promise.all([
-        supabase
-          .from('client_inquiries')
-          .select('id, contact_name, email, created_at, status')
-          .order('created_at', { ascending: false })
-          .limit(5),
-        supabase
-          .from('general_applications')
-          .select('id, name, email, created_at, status')
-          .order('created_at', { ascending: false })
-          .limit(5),
-      ])
-
-      const combined: RecentSubmission[] = [
-        ...(recentInquiries.data || []).map((i) => ({
-          id: i.id,
-          type: 'inquiry' as const,
-          name: i.contact_name,
-          email: i.email,
-          created_at: i.created_at,
-          status: i.status,
-        })),
-        ...(recentApps.data || []).map((a) => ({
-          id: a.id,
-          type: 'application' as const,
-          name: a.name,
-          email: a.email,
-          created_at: a.created_at,
-          status: a.status,
-        })),
-      ]
-        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-        .slice(0, 5)
-
-      setRecentSubmissions(combined)
-      setLoading(false)
-    }
-
     fetchData()
-  }, [])
+  }, [fetchData])
 
   if (loading) {
     return (
@@ -132,9 +137,31 @@ export default function AdminDashboardPage() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600">Welcome to the IILIKA GROUPS admin panel</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-600">Welcome to the IILIKA GROUPS admin panel</p>
+        </div>
+        <button
+          onClick={() => fetchData(true)}
+          disabled={refreshing}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+        >
+          <svg
+            className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+            />
+          </svg>
+          {refreshing ? 'Refreshing...' : 'Refresh'}
+        </button>
       </div>
 
       {/* Alert Cards for New Submissions */}

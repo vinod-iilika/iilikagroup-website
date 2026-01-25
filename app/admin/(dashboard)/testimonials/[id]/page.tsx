@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { Input, Textarea, Select } from '@/components/admin/FormFields'
 import ImageUpload from '@/components/admin/ImageUpload'
+import { useAuth } from '@/lib/auth-context'
 
 interface TestimonialForm {
   client_name: string
@@ -31,42 +32,52 @@ export default function TestimonialEditPage() {
   const router = useRouter()
   const params = useParams()
   const isNew = params.id === 'new'
+  const { user, loading: authLoading } = useAuth()
 
   const [form, setForm] = useState<TestimonialForm>(initialForm)
   const [loading, setLoading] = useState(!isNew)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const fetchTestimonial = useCallback(async () => {
+    if (!user) return
+
+    setLoading(true)
+    try {
+      const supabase = createClient()
+      const { data, error: fetchError } = await supabase
+        .from('testimonials')
+        .select('*')
+        .eq('id', params.id)
+        .single()
+
+      if (fetchError || !data) {
+        router.push('/admin/testimonials')
+        return
+      }
+
+      setForm({
+        client_name: data.client_name,
+        company: data.company || '',
+        position: data.position || '',
+        quote: data.quote,
+        logo_url: data.logo_url,
+        display_order: data.display_order,
+        status: data.status,
+      })
+    } catch (err) {
+      console.error('Error fetching testimonial:', err)
+      setError('Failed to load testimonial')
+    } finally {
+      setLoading(false)
+    }
+  }, [user, params.id, router])
+
   useEffect(() => {
-    if (!isNew) {
+    if (!isNew && !authLoading && user) {
       fetchTestimonial()
     }
-  }, [isNew, params.id])
-
-  const fetchTestimonial = async () => {
-    const supabase = createClient()
-    const { data, error } = await supabase
-      .from('testimonials')
-      .select('*')
-      .eq('id', params.id)
-      .single()
-
-    if (error || !data) {
-      router.push('/admin/testimonials')
-      return
-    }
-
-    setForm({
-      client_name: data.client_name,
-      company: data.company || '',
-      position: data.position || '',
-      quote: data.quote,
-      logo_url: data.logo_url,
-      display_order: data.display_order,
-      status: data.status,
-    })
-    setLoading(false)
-  }
+  }, [isNew, authLoading, user, fetchTestimonial])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

@@ -4,6 +4,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Button from "@/components/ui/Button";
 
+// Disable caching to always fetch fresh data
+export const dynamic = "force-dynamic";
+
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
 }

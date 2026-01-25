@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { Input, Textarea, Select, TagInput, Checkbox } from '@/components/admin/FormFields'
 import ImageUpload from '@/components/admin/ImageUpload'
+import { useAuth } from '@/lib/auth-context'
 
 interface CaseStudyForm {
   slug: string
@@ -45,43 +46,55 @@ export default function CaseStudyEditPage() {
   const router = useRouter()
   const params = useParams()
   const isNew = params.id === 'new'
+  const { user, loading: authLoading } = useAuth()
 
   const [form, setForm] = useState<CaseStudyForm>(initialForm)
   const [loading, setLoading] = useState(!isNew)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (!isNew) fetchCaseStudy()
-  }, [isNew, params.id])
+  const fetchCaseStudy = useCallback(async () => {
+    if (!user) return
 
-  const fetchCaseStudy = async () => {
-    const supabase = createClient()
-    const { data, error } = await supabase.from('case_studies').select('*').eq('id', params.id).single()
+    setLoading(true)
+    try {
+      const supabase = createClient()
+      const { data, error: fetchError } = await supabase.from('case_studies').select('*').eq('id', params.id).single()
 
-    if (error || !data) {
-      router.push('/admin/case-studies')
-      return
+      if (fetchError || !data) {
+        router.push('/admin/case-studies')
+        return
+      }
+
+      setForm({
+        slug: data.slug,
+        title: data.title,
+        client_name: data.client_name || '',
+        industry: data.industry || '',
+        challenge: data.challenge,
+        solution: data.solution,
+        results: data.results || [],
+        technologies: data.technologies || [],
+        thumbnail_url: data.thumbnail_url,
+        featured: data.featured,
+        status: data.status,
+        seo_title: data.seo_title || '',
+        seo_description: data.seo_description || '',
+        seo_keywords: data.seo_keywords || [],
+      })
+    } catch (err) {
+      console.error('Error fetching case study:', err)
+      setError('Failed to load case study')
+    } finally {
+      setLoading(false)
     }
+  }, [user, params.id, router])
 
-    setForm({
-      slug: data.slug,
-      title: data.title,
-      client_name: data.client_name || '',
-      industry: data.industry || '',
-      challenge: data.challenge,
-      solution: data.solution,
-      results: data.results || [],
-      technologies: data.technologies || [],
-      thumbnail_url: data.thumbnail_url,
-      featured: data.featured,
-      status: data.status,
-      seo_title: data.seo_title || '',
-      seo_description: data.seo_description || '',
-      seo_keywords: data.seo_keywords || [],
-    })
-    setLoading(false)
-  }
+  useEffect(() => {
+    if (!authLoading && user && !isNew) {
+      fetchCaseStudy()
+    }
+  }, [authLoading, user, isNew, fetchCaseStudy])
 
   const generateSlug = (title: string) => title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 

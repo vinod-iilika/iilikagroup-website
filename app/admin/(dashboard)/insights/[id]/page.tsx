@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { Input, Textarea, Select, TagInput, Checkbox } from '@/components/admin/FormFields'
 import ImageUpload from '@/components/admin/ImageUpload'
+import { useAuth } from '@/lib/auth-context'
 
 interface InsightForm {
   slug: string
@@ -41,6 +42,7 @@ export default function InsightEditPage() {
   const router = useRouter()
   const params = useParams()
   const isNew = params.id === 'new'
+  const { user, loading: authLoading } = useAuth()
 
   const [form, setForm] = useState<InsightForm>(initialForm)
   const [authors, setAuthors] = useState<{ id: string; name: string }[]>([])
@@ -48,47 +50,65 @@ export default function InsightEditPage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    fetchAuthors()
-    if (!isNew) fetchInsight()
-  }, [isNew, params.id])
-
-  const fetchAuthors = async () => {
-    const supabase = createClient()
-    const { data } = await supabase
-      .from('team_members')
-      .select('id, name')
-      .eq('is_author', true)
-      .eq('status', 'active')
-      .order('name')
-    setAuthors(data || [])
-  }
-
-  const fetchInsight = async () => {
-    const supabase = createClient()
-    const { data, error } = await supabase.from('insights').select('*').eq('id', params.id).single()
-
-    if (error || !data) {
-      router.push('/admin/insights')
-      return
+  const fetchAuthors = useCallback(async () => {
+    if (!user) return
+    try {
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('team_members')
+        .select('id, name')
+        .eq('is_author', true)
+        .eq('status', 'active')
+        .order('name')
+      setAuthors(data || [])
+    } catch (err) {
+      console.error('Error fetching authors:', err)
     }
+  }, [user])
 
-    setForm({
-      slug: data.slug,
-      title: data.title,
-      excerpt: data.excerpt || '',
-      content: data.content,
-      tags: data.tags || [],
-      author_id: data.author_id,
-      cover_image_url: data.cover_image_url,
-      featured: data.featured,
-      status: data.status,
-      seo_title: data.seo_title || '',
-      seo_description: data.seo_description || '',
-      seo_keywords: data.seo_keywords || [],
-    })
-    setLoading(false)
-  }
+  const fetchInsight = useCallback(async () => {
+    if (!user) return
+
+    setLoading(true)
+    try {
+      const supabase = createClient()
+      const { data, error: fetchError } = await supabase.from('insights').select('*').eq('id', params.id).single()
+
+      if (fetchError || !data) {
+        router.push('/admin/insights')
+        return
+      }
+
+      setForm({
+        slug: data.slug,
+        title: data.title,
+        excerpt: data.excerpt || '',
+        content: data.content,
+        tags: data.tags || [],
+        author_id: data.author_id,
+        cover_image_url: data.cover_image_url,
+        featured: data.featured,
+        status: data.status,
+        seo_title: data.seo_title || '',
+        seo_description: data.seo_description || '',
+        seo_keywords: data.seo_keywords || [],
+      })
+    } catch (err) {
+      console.error('Error fetching insight:', err)
+      setError('Failed to load insight')
+    } finally {
+      setLoading(false)
+    }
+  }, [user, params.id, router])
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchAuthors()
+      if (!isNew) {
+        fetchInsight()
+      }
+    }
+  }, [authLoading, user, isNew, fetchAuthors, fetchInsight])
 
   const generateSlug = (title: string) => title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 
