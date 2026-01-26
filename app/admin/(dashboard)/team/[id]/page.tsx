@@ -6,7 +6,6 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { Input, Textarea, Select, Checkbox } from '@/components/admin/FormFields'
 import ImageUpload from '@/components/admin/ImageUpload'
-import { useAuth } from '@/lib/auth-context'
 
 interface TeamMemberForm {
   name: string
@@ -38,7 +37,6 @@ export default function TeamMemberEditPage() {
   const router = useRouter()
   const params = useParams()
   const isNew = params.id === 'new'
-  const { user, loading: authLoading } = useAuth()
 
   const [form, setForm] = useState<TeamMemberForm>(initialForm)
   const [loading, setLoading] = useState(!isNew)
@@ -46,8 +44,6 @@ export default function TeamMemberEditPage() {
   const [error, setError] = useState<string | null>(null)
 
   const fetchTeamMember = useCallback(async () => {
-    if (!user) return
-
     setLoading(true)
     try {
       const supabase = createClient()
@@ -76,13 +72,13 @@ export default function TeamMemberEditPage() {
     } finally {
       setLoading(false)
     }
-  }, [user, params.id, router])
+  }, [params.id, router])
 
   useEffect(() => {
-    if (!authLoading && user && !isNew) {
+    if (!isNew) {
       fetchTeamMember()
     }
-  }, [authLoading, user, isNew, fetchTeamMember])
+  }, [isNew, fetchTeamMember])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

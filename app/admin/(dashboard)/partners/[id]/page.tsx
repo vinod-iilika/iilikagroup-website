@@ -6,7 +6,6 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { Input, Select } from '@/components/admin/FormFields'
 import ImageUpload from '@/components/admin/ImageUpload'
-import { useAuth } from '@/lib/auth-context'
 
 interface PartnerLogoForm {
   company_name: string
@@ -30,7 +29,6 @@ export default function PartnerLogoEditPage() {
   const router = useRouter()
   const params = useParams()
   const isNew = params.id === 'new'
-  const { user, loading: authLoading } = useAuth()
 
   const [form, setForm] = useState<PartnerLogoForm>(initialForm)
   const [loading, setLoading] = useState(!isNew)
@@ -38,8 +36,6 @@ export default function PartnerLogoEditPage() {
   const [error, setError] = useState<string | null>(null)
 
   const fetchPartnerLogo = useCallback(async () => {
-    if (!user) return
-
     setLoading(true)
     try {
       const supabase = createClient()
@@ -64,13 +60,13 @@ export default function PartnerLogoEditPage() {
     } finally {
       setLoading(false)
     }
-  }, [user, params.id, router])
+  }, [params.id, router])
 
   useEffect(() => {
-    if (!authLoading && user && !isNew) {
+    if (!isNew) {
       fetchPartnerLogo()
     }
-  }, [authLoading, user, isNew, fetchPartnerLogo])
+  }, [isNew, fetchPartnerLogo])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

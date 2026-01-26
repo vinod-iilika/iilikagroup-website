@@ -6,7 +6,6 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { Input, Textarea, Select, TagInput, Checkbox } from '@/components/admin/FormFields'
 import ImageUpload from '@/components/admin/ImageUpload'
-import { useAuth } from '@/lib/auth-context'
 
 interface ProductForm {
   slug: string
@@ -50,7 +49,6 @@ export default function ProductEditPage() {
   const router = useRouter()
   const params = useParams()
   const isNew = params.id === 'new'
-  const { user, loading: authLoading } = useAuth()
 
   const [form, setForm] = useState<ProductForm>(initialForm)
   const [loading, setLoading] = useState(!isNew)
@@ -58,8 +56,6 @@ export default function ProductEditPage() {
   const [error, setError] = useState<string | null>(null)
 
   const fetchProduct = useCallback(async () => {
-    if (!user) return
-
     setLoading(true)
     try {
       const supabase = createClient()
@@ -94,13 +90,13 @@ export default function ProductEditPage() {
     } finally {
       setLoading(false)
     }
-  }, [user, params.id, router])
+  }, [params.id, router])
 
   useEffect(() => {
-    if (!authLoading && user && !isNew) {
+    if (!isNew) {
       fetchProduct()
     }
-  }, [authLoading, user, isNew, fetchProduct])
+  }, [isNew, fetchProduct])
 
   const generateSlug = (title: string) => title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 

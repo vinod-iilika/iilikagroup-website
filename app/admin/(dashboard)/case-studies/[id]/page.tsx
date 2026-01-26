@@ -6,7 +6,6 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { Input, Textarea, Select, TagInput, Checkbox } from '@/components/admin/FormFields'
 import ImageUpload from '@/components/admin/ImageUpload'
-import { useAuth } from '@/lib/auth-context'
 
 interface CaseStudyForm {
   slug: string
@@ -46,16 +45,12 @@ export default function CaseStudyEditPage() {
   const router = useRouter()
   const params = useParams()
   const isNew = params.id === 'new'
-  const { user, loading: authLoading } = useAuth()
-
   const [form, setForm] = useState<CaseStudyForm>(initialForm)
   const [loading, setLoading] = useState(!isNew)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const fetchCaseStudy = useCallback(async () => {
-    if (!user) return
-
     setLoading(true)
     try {
       const supabase = createClient()
@@ -88,13 +83,13 @@ export default function CaseStudyEditPage() {
     } finally {
       setLoading(false)
     }
-  }, [user, params.id, router])
+  }, [params.id, router])
 
   useEffect(() => {
-    if (!authLoading && user && !isNew) {
+    if (!isNew) {
       fetchCaseStudy()
     }
-  }, [authLoading, user, isNew, fetchCaseStudy])
+  }, [isNew, fetchCaseStudy])
 
   const generateSlug = (title: string) => title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 

@@ -6,7 +6,6 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { Input, Textarea, Select } from '@/components/admin/FormFields'
 import ImageUpload from '@/components/admin/ImageUpload'
-import { useAuth } from '@/lib/auth-context'
 
 interface TestimonialForm {
   client_name: string
@@ -32,7 +31,6 @@ export default function TestimonialEditPage() {
   const router = useRouter()
   const params = useParams()
   const isNew = params.id === 'new'
-  const { user, loading: authLoading } = useAuth()
 
   const [form, setForm] = useState<TestimonialForm>(initialForm)
   const [loading, setLoading] = useState(!isNew)
@@ -40,8 +38,6 @@ export default function TestimonialEditPage() {
   const [error, setError] = useState<string | null>(null)
 
   const fetchTestimonial = useCallback(async () => {
-    if (!user) return
-
     setLoading(true)
     try {
       const supabase = createClient()
@@ -71,13 +67,13 @@ export default function TestimonialEditPage() {
     } finally {
       setLoading(false)
     }
-  }, [user, params.id, router])
+  }, [params.id, router])
 
   useEffect(() => {
-    if (!isNew && !authLoading && user) {
+    if (!isNew) {
       fetchTestimonial()
     }
-  }, [isNew, authLoading, user, fetchTestimonial])
+  }, [isNew, fetchTestimonial])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

@@ -6,7 +6,6 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { Input, Textarea, Select, TagInput, Checkbox } from '@/components/admin/FormFields'
 import ImageUpload from '@/components/admin/ImageUpload'
-import { useAuth } from '@/lib/auth-context'
 
 interface InsightForm {
   slug: string
@@ -42,7 +41,6 @@ export default function InsightEditPage() {
   const router = useRouter()
   const params = useParams()
   const isNew = params.id === 'new'
-  const { user, loading: authLoading } = useAuth()
 
   const [form, setForm] = useState<InsightForm>(initialForm)
   const [authors, setAuthors] = useState<{ id: string; name: string }[]>([])
@@ -51,7 +49,6 @@ export default function InsightEditPage() {
   const [error, setError] = useState<string | null>(null)
 
   const fetchAuthors = useCallback(async () => {
-    if (!user) return
     try {
       const supabase = createClient()
       const { data } = await supabase
@@ -64,11 +61,9 @@ export default function InsightEditPage() {
     } catch (err) {
       console.error('Error fetching authors:', err)
     }
-  }, [user])
+  }, [])
 
   const fetchInsight = useCallback(async () => {
-    if (!user) return
-
     setLoading(true)
     try {
       const supabase = createClient()
@@ -99,16 +94,14 @@ export default function InsightEditPage() {
     } finally {
       setLoading(false)
     }
-  }, [user, params.id, router])
+  }, [params.id, router])
 
   useEffect(() => {
-    if (!authLoading && user) {
-      fetchAuthors()
-      if (!isNew) {
-        fetchInsight()
-      }
+    fetchAuthors()
+    if (!isNew) {
+      fetchInsight()
     }
-  }, [authLoading, user, isNew, fetchAuthors, fetchInsight])
+  }, [isNew, fetchAuthors, fetchInsight])
 
   const generateSlug = (title: string) => title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 

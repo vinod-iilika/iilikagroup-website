@@ -5,7 +5,6 @@ import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { Input, Textarea, Select, TagInput } from '@/components/admin/FormFields'
-import { useAuth } from '@/lib/auth-context'
 
 interface ServiceForm {
   slug: string
@@ -41,7 +40,6 @@ export default function ServiceEditPage() {
   const router = useRouter()
   const params = useParams()
   const isNew = params.id === 'new'
-  const { user, loading: authLoading } = useAuth()
 
   const [form, setForm] = useState<ServiceForm>(initialForm)
   const [pillars, setPillars] = useState<{ id: string; title: string }[]>([])
@@ -50,7 +48,6 @@ export default function ServiceEditPage() {
   const [error, setError] = useState<string | null>(null)
 
   const fetchPillars = useCallback(async () => {
-    if (!user) return
     try {
       const supabase = createClient()
       const { data } = await supabase
@@ -62,11 +59,9 @@ export default function ServiceEditPage() {
     } catch (err) {
       console.error('Error fetching pillars:', err)
     }
-  }, [user])
+  }, [])
 
   const fetchService = useCallback(async () => {
-    if (!user) return
-
     setLoading(true)
     try {
       const supabase = createClient()
@@ -101,16 +96,14 @@ export default function ServiceEditPage() {
     } finally {
       setLoading(false)
     }
-  }, [user, params.id, router])
+  }, [params.id, router])
 
   useEffect(() => {
-    if (!authLoading && user) {
-      fetchPillars()
-      if (!isNew) {
-        fetchService()
-      }
+    fetchPillars()
+    if (!isNew) {
+      fetchService()
     }
-  }, [authLoading, user, isNew, fetchPillars, fetchService])
+  }, [isNew, fetchPillars, fetchService])
 
   const generateSlug = (title: string) => {
     return title
