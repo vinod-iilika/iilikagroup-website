@@ -37,7 +37,7 @@ export default function StoragePage() {
 
       for (const bucket of BUCKETS) {
         const { data } = await supabase.storage.from(bucket).list()
-        const totalSize = data?.reduce((acc, file) => acc + (file.metadata?.size || 0), 0) || 0
+        const totalSize = data?.reduce((acc: number, file: { metadata?: { size?: number } }) => acc + (file.metadata?.size || 0), 0) || 0
         stats.push({
           name: bucket,
           fileCount: data?.length || 0,
