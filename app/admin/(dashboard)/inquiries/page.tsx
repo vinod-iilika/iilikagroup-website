@@ -21,13 +21,12 @@ interface ClientInquiry {
 export default function InquiriesPage() {
   const [inquiries, setInquiries] = useState<ClientInquiry[]>([])
   const [loading, setLoading] = useState(true)
-  const [refreshing, setRefreshing] = useState(false)
   const [selectedInquiry, setSelectedInquiry] = useState<ClientInquiry | null>(null)
   const [adminNotes, setAdminNotes] = useState('')
   const [saving, setSaving] = useState(false)
 
-  const fetchInquiries = async (isRefresh = false) => {
-    if (isRefresh) setRefreshing(true)
+  const fetchInquiries = async () => {
+    setLoading(true)
     const supabase = createClient()
     const { data } = await supabase
       .from('client_inquiries')
@@ -36,7 +35,6 @@ export default function InquiriesPage() {
 
     setInquiries(data || [])
     setLoading(false)
-    setRefreshing(false)
   }
 
   useEffect(() => {
@@ -82,12 +80,12 @@ export default function InquiriesPage() {
           <p className="text-gray-600">Manage inquiries from potential clients</p>
         </div>
         <button
-          onClick={() => fetchInquiries(true)}
-          disabled={refreshing}
+          onClick={fetchInquiries}
+          disabled={loading}
           className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
         >
           <svg
-            className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`}
+            className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -99,7 +97,7 @@ export default function InquiriesPage() {
               d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
             />
           </svg>
-          {refreshing ? 'Refreshing...' : 'Refresh'}
+          {loading ? 'Loading...' : 'Refresh'}
         </button>
       </div>
 

@@ -1,8 +1,7 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
-import { useAuth } from '@/lib/auth-context'
 
 interface StorageFile {
   name: string
@@ -28,16 +27,10 @@ export default function StoragePage() {
   const [selectedBucket, setSelectedBucket] = useState<string | null>(null)
   const [files, setFiles] = useState<StorageFile[]>([])
   const [loading, setLoading] = useState(true)
-  const [refreshing, setRefreshing] = useState(false)
   const [deleting, setDeleting] = useState<string | null>(null)
-  const { user, loading: authLoading } = useAuth()
 
-  const fetchBucketStats = useCallback(async (isRefresh = false) => {
-    if (!user) return
-
-    if (isRefresh) setRefreshing(true)
-    else setLoading(true)
-
+  const fetchBucketStats = async () => {
+    setLoading(true)
     try {
       const supabase = createClient()
       const stats: BucketStats[] = []
@@ -57,15 +50,12 @@ export default function StoragePage() {
       console.error('Error fetching bucket stats:', err)
     } finally {
       setLoading(false)
-      setRefreshing(false)
     }
-  }, [user])
+  }
 
   useEffect(() => {
-    if (!authLoading && user) {
-      fetchBucketStats()
-    }
-  }, [authLoading, user, fetchBucketStats])
+    fetchBucketStats()
+  }, [])
 
   const fetchBucketFiles = async (bucket: string) => {
     setSelectedBucket(bucket)
@@ -127,14 +117,14 @@ export default function StoragePage() {
           <p className="text-gray-600">Manage uploaded files and clean up orphaned files</p>
         </div>
         <button
-          onClick={() => fetchBucketStats(true)}
-          disabled={refreshing}
+          onClick={fetchBucketStats}
+          disabled={loading}
           className="inline-flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors disabled:opacity-50"
         >
-          <svg className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
-          {refreshing ? 'Refreshing...' : 'Refresh'}
+          {loading ? 'Loading...' : 'Refresh'}
         </button>
       </div>
 
