@@ -20,6 +20,16 @@ interface BucketStats {
   totalSize: number
 }
 
+interface SupabaseFile {
+  name: string
+  id: string
+  created_at: string
+  metadata?: {
+    size?: number
+    mimetype?: string
+  }
+}
+
 const BUCKETS = ['logos', 'team', 'products', 'insights', 'case-studies']
 
 export default function StoragePage() {
@@ -62,7 +72,7 @@ export default function StoragePage() {
     const supabase = createClient()
     const { data } = await supabase.storage.from(bucket).list()
 
-    const filesWithBucket = (data || []).map((file) => ({
+    const filesWithBucket = ((data || []) as SupabaseFile[]).map((file) => ({
       ...file,
       bucket,
       metadata: file.metadata as { size: number; mimetype: string },
