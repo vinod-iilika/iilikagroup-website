@@ -25,6 +25,22 @@ interface RecentSubmission {
   status: string
 }
 
+interface Inquiry {
+  id: string
+  contact_name: string
+  email: string
+  created_at: string
+  status: string
+}
+
+interface Application {
+  id: string
+  name: string
+  email: string
+  created_at: string
+  status: string
+}
+
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [recentSubmissions, setRecentSubmissions] = useState<RecentSubmission[]>([])
@@ -84,7 +100,7 @@ export default function AdminDashboardPage() {
     ])
 
     const combined: RecentSubmission[] = [
-      ...(recentInquiries.data || []).map((i) => ({
+      ...((recentInquiries.data || []) as Inquiry[]).map((i) => ({
         id: i.id,
         type: 'inquiry' as const,
         name: i.contact_name,
@@ -92,7 +108,7 @@ export default function AdminDashboardPage() {
         created_at: i.created_at,
         status: i.status,
       })),
-      ...(recentApps.data || []).map((a) => ({
+      ...((recentApps.data || []) as Application[]).map((a) => ({
         id: a.id,
         type: 'application' as const,
         name: a.name,
