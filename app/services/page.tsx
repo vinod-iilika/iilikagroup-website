@@ -16,7 +16,7 @@ export default function Services() {
         "Flexible engagement models",
       ],
       cta: "Hire Talent",
-      link: "/contact",
+      link: "/staffing",
     },
     {
       id: "gcc",

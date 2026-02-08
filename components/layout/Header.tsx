@@ -24,11 +24,17 @@ export default function Header() {
     { name: "Home", href: "/" },
     { name: "About", href: "/about" },
     { name: "Services", href: "/services" },
+    { name: "Staffing", href: "/staffing" },
     { name: "GCC Enablement", href: "/gcc-enablement" },
     { name: "Projects", href: "/service-based-projects" },
+    { name: "Insights", href: "/insights" },
+    { name: "Case Studies", href: "/case-studies" },
     { name: "Careers", href: "/careers" },
     { name: "Contact", href: "/contact" },
   ];
+
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
     <header
@@ -51,15 +57,19 @@ export default function Header() {
             />
           </Link>
 
-          <div className="hidden lg:flex items-center space-x-8">
+          <div className="hidden lg:flex items-center space-x-6">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 className={`font-medium transition-colors duration-200 ${
-                  isTransparent
-                    ? "text-white hover:text-gray-200"
-                    : "text-[#333333] hover:text-[#FF000E]"
+                  isActive(link.href)
+                    ? isTransparent
+                      ? "text-white border-b-2 border-white"
+                      : "text-[#FF000E] border-b-2 border-[#FF000E]"
+                    : isTransparent
+                      ? "text-white/70 hover:text-white"
+                      : "text-[#333333] hover:text-[#FF000E]"
                 }`}
               >
                 {link.name}
@@ -101,9 +111,13 @@ export default function Header() {
                 key={link.href}
                 href={link.href}
                 className={`block py-3 font-medium transition-colors duration-200 ${
-                  isTransparent
-                    ? "text-white hover:text-gray-200"
-                    : "text-[#333333] hover:text-[#FF000E]"
+                  isActive(link.href)
+                    ? isTransparent
+                      ? "text-white font-bold"
+                      : "text-[#FF000E] font-bold"
+                    : isTransparent
+                      ? "text-white/70 hover:text-white"
+                      : "text-[#333333] hover:text-[#FF000E]"
                 }`}
                 onClick={() => setIsMenuOpen(false)}
               >
