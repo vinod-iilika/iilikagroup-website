@@ -2,10 +2,23 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 50);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const isTransparent = isHome && !scrolled;
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -18,12 +31,18 @@ export default function Header() {
   ];
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isTransparent
+          ? "bg-transparent"
+          : "bg-white border-b border-gray-200 shadow-sm"
+      }`}
+    >
       <nav className="container-custom">
         <div className="flex items-center justify-between h-20">
           <Link href="/">
             <Image
-              src="/images/ig-logo-small.jpg"
+              src="/images/iilikia-groups.svg"
               alt="IILIKA GROUPS"
               width={150}
               height={50}
@@ -37,7 +56,11 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-[#333333] hover:text-[#FF000E] font-medium transition-colors duration-200"
+                className={`font-medium transition-colors duration-200 ${
+                  isTransparent
+                    ? "text-white hover:text-gray-200"
+                    : "text-[#333333] hover:text-[#FF000E]"
+                }`}
               >
                 {link.name}
               </Link>
@@ -45,7 +68,9 @@ export default function Header() {
           </div>
 
           <button
-            className="lg:hidden text-[#333333] focus:outline-none"
+            className={`lg:hidden focus:outline-none ${
+              isTransparent ? "text-white" : "text-[#333333]"
+            }`}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
           >
@@ -68,12 +93,18 @@ export default function Header() {
         </div>
 
         {isMenuOpen && (
-          <div className="lg:hidden py-4 border-t border-gray-200">
+          <div className={`lg:hidden py-4 border-t ${
+            isTransparent ? "border-white/20 bg-black/30 backdrop-blur-sm" : "border-gray-200"
+          }`}>
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="block py-3 text-[#333333] hover:text-[#FF000E] font-medium transition-colors duration-200"
+                className={`block py-3 font-medium transition-colors duration-200 ${
+                  isTransparent
+                    ? "text-white hover:text-gray-200"
+                    : "text-[#333333] hover:text-[#FF000E]"
+                }`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 {link.name}

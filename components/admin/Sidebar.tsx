@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 
@@ -59,8 +60,8 @@ export default function Sidebar() {
     <aside className="w-64 bg-gray-900 text-white min-h-screen flex flex-col">
       {/* Logo */}
       <div className="p-6 border-b border-gray-800">
-        <Link href="/admin" className="flex items-center gap-2">
-          <span className="text-xl font-bold">IILIKA</span>
+        <Link href="/admin" className="flex items-center gap-3">
+          <Image src="/images/iilikia-groups.svg" alt="IILIKA GROUPS" width={100} height={32} className="h-8 w-auto" />
           <span className="text-xs bg-[#FF000E] px-2 py-0.5 rounded">ADMIN</span>
         </Link>
       </div>
