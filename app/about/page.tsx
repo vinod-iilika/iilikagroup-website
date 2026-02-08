@@ -24,21 +24,30 @@ interface PartnerLogo {
 }
 
 export default async function About() {
-  const supabase = await createServerSupabaseClient();
+  let teamMembers: TeamMember[] | null = null;
+  let partnerLogos: PartnerLogo[] | null = null;
 
-  // Fetch team members
-  const { data: teamMembers } = await supabase
-    .from("team_members")
-    .select("id, name, position, department, bio, photo_url, linkedin_url")
-    .eq("status", "active")
-    .order("display_order");
+  try {
+    const supabase = await createServerSupabaseClient();
 
-  // Fetch partner logos
-  const { data: partnerLogos } = await supabase
-    .from("partner_logos")
-    .select("id, company_name, logo_url, website_url, type")
-    .eq("status", "active")
-    .order("display_order");
+    // Fetch team members
+    const { data: teamData } = await supabase
+      .from("team_members")
+      .select("id, name, position, department, bio, photo_url, linkedin_url")
+      .eq("status", "active")
+      .order("display_order");
+    teamMembers = teamData;
+
+    // Fetch partner logos
+    const { data: logoData } = await supabase
+      .from("partner_logos")
+      .select("id, company_name, logo_url, website_url, type")
+      .eq("status", "active")
+      .order("display_order");
+    partnerLogos = logoData;
+  } catch {
+    // Supabase unavailable — page will render without dynamic data
+  }
 
   const values = [
     {
