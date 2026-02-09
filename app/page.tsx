@@ -3,6 +3,7 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import TestimonialsCarousel from "@/components/TestimonialsCarousel";
 import Link from "next/link";
+import { JsonLd } from "@/components/JsonLd";
 
 export default function Home() {
   const services = [
@@ -28,6 +29,14 @@ export default function Home() {
 
   return (
     <>
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "IILIKA GROUPS",
+          url: "https://iilikagroups.com",
+        }}
+      />
       <Hero />
 
       <section className="bg-gray-50 py-16">
@@ -106,12 +115,12 @@ export default function Home() {
           </Link>
           <div className="flex items-center justify-center gap-4 mt-6">
             <Link href="/case-studies">
-              <Button variant="outline" size="sm" className="border-white text-white hover:bg-white hover:text-[#333333]">
+              <Button variant="outline-light" size="sm">
                 Case Studies
               </Button>
             </Link>
             <Link href="/insights">
-              <Button variant="outline" size="sm" className="border-white text-white hover:bg-white hover:text-[#333333]">
+              <Button variant="outline-light" size="sm">
                 Insights
               </Button>
             </Link>

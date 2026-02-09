@@ -3,6 +3,12 @@ import Button from "@/components/ui/Button";
 import ServicesProductsCarousel from "@/components/ServicesProductsCarousel";
 import Link from "next/link";
 
+export const metadata = {
+  title: "Services",
+  description:
+    "Comprehensive IT solutions — staffing and deployed resources, GCC enablement, and service-based project delivery for modern enterprises.",
+};
+
 export default function Services() {
   const services = [
     {
@@ -120,12 +126,12 @@ export default function Services() {
           </Link>
           <div className="flex items-center justify-center gap-4 mt-6">
             <Link href="/case-studies">
-              <Button variant="outline" size="sm" className="border-white text-white hover:bg-white hover:text-[#333333]">
+              <Button variant="outline-light" size="sm">
                 Case Studies
               </Button>
             </Link>
             <Link href="/insights">
-              <Button variant="outline" size="sm" className="border-white text-white hover:bg-white hover:text-[#333333]">
+              <Button variant="outline-light" size="sm">
                 Insights
               </Button>
             </Link>

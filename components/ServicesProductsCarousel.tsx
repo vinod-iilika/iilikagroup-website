@@ -2,14 +2,17 @@
 
 import { useState, useEffect } from "react";
 import Card from "./ui/Card";
+import Button from "./ui/Button";
 import { createClient } from "@/lib/supabase";
 import Image from "next/image";
+import Link from "next/link";
 
 interface Service {
   id: string;
   title: string;
   description: string | null;
   icon_name: string | null;
+  slug: string;
 }
 
 interface Product {
@@ -143,7 +146,7 @@ export default function ServicesProductsCarousel() {
       const [servicesRes, productsRes] = await Promise.all([
         supabase
           .from("services")
-          .select("id, title, description, icon_name")
+          .select("id, title, description, icon_name, slug")
           .eq("status", "active")
           .eq("type", "offering")
           .order("display_order"),
@@ -175,7 +178,7 @@ export default function ServicesProductsCarousel() {
               itemCount={services.length}
             >
               {services.map((service) => (
-                <Card key={service.id} className="h-full">
+                <Card key={service.id} className="h-full flex flex-col">
                   {service.icon_name && (
                     <div className="w-12 h-12 bg-[#FF000E]/10 rounded-lg flex items-center justify-center mb-4">
                       <span className="text-[#FF000E] text-xl font-bold">
@@ -185,10 +188,15 @@ export default function ServicesProductsCarousel() {
                   )}
                   <h3 className="text-lg font-semibold text-black mb-2">{service.title}</h3>
                   {service.description && (
-                    <p className="text-[#333333] text-sm leading-relaxed line-clamp-3">
+                    <p className="text-[#333333] text-sm leading-relaxed line-clamp-3 mb-4">
                       {service.description}
                     </p>
                   )}
+                  <div className="mt-auto pt-2">
+                    <Link href={`/services/${service.slug}`}>
+                      <Button variant="outline" size="sm">Learn More</Button>
+                    </Link>
+                  </div>
                 </Card>
               ))}
             </Carousel>
@@ -205,7 +213,7 @@ export default function ServicesProductsCarousel() {
               itemCount={products.length}
             >
               {products.map((product) => (
-                <Card key={product.id} className="h-full">
+                <Card key={product.id} className="h-full flex flex-col">
                   {product.image_url && (
                     <div className="relative w-full h-40 mb-4 rounded overflow-hidden bg-gray-100">
                       <Image
@@ -223,7 +231,7 @@ export default function ServicesProductsCarousel() {
                     </p>
                   )}
                   {product.technologies.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex flex-wrap gap-1 mb-4">
                       {product.technologies.slice(0, 4).map((tech) => (
                         <span
                           key={tech}
@@ -234,6 +242,11 @@ export default function ServicesProductsCarousel() {
                       ))}
                     </div>
                   )}
+                  <div className="mt-auto pt-2">
+                    <Link href={`/products/${product.slug}`}>
+                      <Button variant="outline" size="sm">Learn More</Button>
+                    </Link>
+                  </div>
                 </Card>
               ))}
             </Carousel>

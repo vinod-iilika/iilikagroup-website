@@ -1,8 +1,9 @@
 import { AuthProvider } from '@/lib/auth-context'
 
 export const metadata = {
-  title: 'Admin | IILIKA GROUPS',
-  description: 'IILIKA GROUPS Admin Panel',
+  title: "Admin",
+  description: "IILIKA GROUPS Admin Panel",
+  robots: { index: false, follow: false },
 }
 
 export default function AdminRootLayout({

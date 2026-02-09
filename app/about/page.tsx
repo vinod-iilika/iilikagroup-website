@@ -2,6 +2,12 @@ import Card from "@/components/ui/Card";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import Image from "next/image";
 
+export const metadata = {
+  title: "About Us",
+  description:
+    "Learn about IILIKA GROUPS — our mission, leadership team, and the partners who help us deliver IT staffing, GCC enablement, and project delivery solutions.",
+};
+
 // Disable caching to always fetch fresh data
 export const dynamic = "force-dynamic";
 

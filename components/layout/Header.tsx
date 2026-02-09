@@ -58,7 +58,7 @@ export default function Header() {
         <div className="flex items-center justify-between h-20">
           <Link href="/">
             <Image
-              src="/images/iilikia-groups.svg"
+              src="/images/iilika-groups.svg"
               alt="IILIKA GROUPS"
               width={150}
               height={50}

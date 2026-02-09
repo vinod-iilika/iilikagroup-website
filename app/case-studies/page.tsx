@@ -19,8 +19,9 @@ interface CaseStudy {
 }
 
 export const metadata = {
-  title: "Case Studies | IILIKA GROUPS",
-  description: "Explore how IILIKA GROUPS has helped enterprises with IT staffing, GCC enablement, and project delivery.",
+  title: "Case Studies",
+  description:
+    "Explore how IILIKA GROUPS has helped enterprises with IT staffing, GCC enablement, and project delivery.",
 };
 
 export default async function CaseStudiesPage() {

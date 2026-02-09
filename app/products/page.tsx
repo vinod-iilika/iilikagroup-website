@@ -22,8 +22,9 @@ interface Product {
 }
 
 export const metadata = {
-  title: "Products | IILIKA GROUPS",
-  description: "Explore our technology products, client deliveries, and partner solutions at IILIKA GROUPS.",
+  title: "Products",
+  description:
+    "Explore our technology products, client deliveries, and partner solutions at IILIKA GROUPS.",
 };
 
 const typeLabels: Record<string, { label: string; description: string }> = {

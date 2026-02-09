@@ -39,18 +39,33 @@ export async function generateMetadata({ params }: ProductPageProps) {
 
   const { data: product } = await supabase
     .from("products")
-    .select("title, tagline, seo_title, seo_description")
+    .select("title, tagline, seo_title, seo_description, image_url")
     .eq("slug", slug)
     .eq("status", "active")
     .single();
 
   if (!product) {
-    return { title: "Product Not Found | IILIKA GROUPS" };
+    return { title: "Product Not Found" };
   }
 
+  const title = product.seo_title || product.title;
+  const description = product.seo_description || product.tagline;
+
   return {
-    title: product.seo_title || `${product.title} | IILIKA GROUPS`,
-    description: product.seo_description || product.tagline,
+    title,
+    description,
+    openGraph: {
+      title,
+      description: description || undefined,
+      type: "website",
+      ...(product.image_url && { images: [{ url: product.image_url }] }),
+    },
+    twitter: {
+      card: product.image_url ? ("summary_large_image" as const) : ("summary" as const),
+      title,
+      description: description || undefined,
+      ...(product.image_url && { images: [product.image_url] }),
+    },
   };
 }
 

@@ -40,10 +40,29 @@
 ## Short-term Tasks (Next 1-2 Weeks)
 
 ### 5. SEO & Meta Tags
-- [ ] Add dynamic meta tags to content pages using SEO fields from database
-- [ ] Generate JSON-LD schema for blog posts
-- [ ] Add Open Graph tags for social sharing
-- [ ] Create sitemap.xml
+- [x] Add dynamic meta tags to content pages using SEO fields from database
+- [x] Generate JSON-LD schema for blog posts (BlogPosting on insights/[slug])
+- [x] Add Open Graph tags for social sharing (all pages)
+- [x] Create sitemap.xml (dynamic, fetches slugs from Supabase)
+- [x] Create robots.txt (blocks /admin/, /api/)
+- [x] Add Twitter Cards (all pages)
+- [x] Add JSON-LD Organization schema (root layout)
+- [x] Add JSON-LD Service schema (gcc, staffing, projects pages)
+- [x] Add JSON-LD WebSite schema (home page)
+- [x] Add title template (%s | IILIKA GROUPS)
+- [x] Add metadataBase for canonical URLs
+- [x] Add OG image (iilika-groups-large.png 1200x630)
+- [x] Block admin pages from indexing (noindex/nofollow)
+
+### 5b. SEO - Phase 2 (Future)
+- [ ] Dynamic OG image generation using next/og ImageResponse API
+- [ ] Explicit canonical URLs (alternates.canonical) on slug pages
+- [ ] JSON-LD Article schema on case-studies/[slug]
+- [ ] JSON-LD JobPosting schema on /careers (requires server component refactor)
+- [ ] BreadcrumbList JSON-LD schema for site hierarchy
+- [ ] Verify SEO fields (seo_title, seo_description) are editable in admin CRUD forms
+- [ ] Favicon set (apple-touch-icon, PNG favicons for broader compatibility)
+- [ ] manifest.json (PWA support)
 
 ### 6. UI/UX Improvements
 - [ ] Add loading skeletons for data fetching

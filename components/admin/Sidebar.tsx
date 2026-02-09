@@ -62,7 +62,7 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="p-6 border-b border-gray-800">
         <Link href="/admin" className="flex items-center gap-3">
-          <Image src="/images/iilikia-groups.svg" alt="IILIKA GROUPS" width={100} height={32} className="h-8 w-auto" />
+          <Image src="/images/iilika-groups.svg" alt="IILIKA GROUPS" width={100} height={32} className="h-8 w-auto" />
           <span className="text-xs bg-[#FF000E] px-2 py-0.5 rounded">ADMIN</span>
         </Link>
       </div>

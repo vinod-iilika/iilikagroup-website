@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Button from "@/components/ui/Button";
+import { JsonLd } from "@/components/JsonLd";
 
 // Disable caching to always fetch fresh data
 export const dynamic = "force-dynamic";
@@ -38,18 +39,37 @@ export async function generateMetadata({ params }: InsightPageProps) {
 
   const { data: insight } = await supabase
     .from("insights")
-    .select("title, excerpt, seo_title, seo_description")
+    .select("title, excerpt, seo_title, seo_description, cover_image_url")
     .eq("slug", slug)
     .eq("status", "published")
     .single();
 
   if (!insight) {
-    return { title: "Insight Not Found | IILIKA GROUPS" };
+    return { title: "Insight Not Found" };
   }
 
+  const title = insight.seo_title || insight.title;
+  const description = insight.seo_description || insight.excerpt;
+
   return {
-    title: insight.seo_title || `${insight.title} | IILIKA GROUPS`,
-    description: insight.seo_description || insight.excerpt,
+    title,
+    description,
+    openGraph: {
+      title,
+      description: description || undefined,
+      type: "article",
+      ...(insight.cover_image_url && {
+        images: [{ url: insight.cover_image_url }],
+      }),
+    },
+    twitter: {
+      card: insight.cover_image_url
+        ? ("summary_large_image" as const)
+        : ("summary" as const),
+      title,
+      description: description || undefined,
+      ...(insight.cover_image_url && { images: [insight.cover_image_url] }),
+    },
   };
 }
 
@@ -145,6 +165,27 @@ export default async function InsightPage({ params }: InsightPageProps) {
 
   return (
     <>
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          headline: typedInsight.title,
+          description: typedInsight.excerpt || undefined,
+          datePublished: typedInsight.created_at,
+          ...(typedInsight.cover_image_url && {
+            image: typedInsight.cover_image_url,
+          }),
+          author: {
+            "@type": "Person",
+            name: typedInsight.author?.name || "IILIKA GROUPS",
+          },
+          publisher: {
+            "@type": "Organization",
+            name: "IILIKA GROUPS",
+            url: "https://iilikagroups.com",
+          },
+        }}
+      />
       <article className="bg-white">
         {/* Header */}
         <section className="bg-gradient-to-b from-gray-50 to-white py-16">

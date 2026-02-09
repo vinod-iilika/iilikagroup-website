@@ -32,8 +32,9 @@ interface Insight {
 }
 
 export const metadata = {
-  title: "Insights | IILIKA GROUPS",
-  description: "Expert insights on IT staffing, GCC enablement, and technology trends from IILIKA GROUPS.",
+  title: "Insights",
+  description:
+    "Expert insights on IT staffing, GCC enablement, and technology trends from IILIKA GROUPS.",
 };
 
 export default async function InsightsPage() {

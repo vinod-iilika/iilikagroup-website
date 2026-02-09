@@ -32,18 +32,39 @@ export async function generateMetadata({ params }: CaseStudyPageProps) {
 
   const { data: caseStudy } = await supabase
     .from("case_studies")
-    .select("title, client_name, seo_title, seo_description")
+    .select("title, client_name, seo_title, seo_description, thumbnail_url")
     .eq("slug", slug)
     .eq("status", "published")
     .single();
 
   if (!caseStudy) {
-    return { title: "Case Study Not Found | IILIKA GROUPS" };
+    return { title: "Case Study Not Found" };
   }
 
+  const title = caseStudy.seo_title || caseStudy.title;
+  const description =
+    caseStudy.seo_description ||
+    `Case study: ${caseStudy.title}${caseStudy.client_name ? ` for ${caseStudy.client_name}` : ""}`;
+
   return {
-    title: caseStudy.seo_title || `${caseStudy.title} | IILIKA GROUPS`,
-    description: caseStudy.seo_description || `Case study: ${caseStudy.title}${caseStudy.client_name ? ` for ${caseStudy.client_name}` : ""}`,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "article",
+      ...(caseStudy.thumbnail_url && {
+        images: [{ url: caseStudy.thumbnail_url }],
+      }),
+    },
+    twitter: {
+      card: caseStudy.thumbnail_url
+        ? ("summary_large_image" as const)
+        : ("summary" as const),
+      title,
+      description,
+      ...(caseStudy.thumbnail_url && { images: [caseStudy.thumbnail_url] }),
+    },
   };
 }
 
