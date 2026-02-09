@@ -6,9 +6,9 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 
 const serviceSubLinks = [
-  { name: "Staffing", href: "/staffing" },
+  { name: "Staffing Solutions", href: "/staffing" },
   { name: "GCC Enablement", href: "/gcc-enablement" },
-  { name: "Projects", href: "/service-based-projects" },
+  { name: "Project Delivery", href: "/service-based-projects" },
 ];
 
 const servicePaths = ["/services", "/staffing", "/gcc-enablement", "/service-based-projects"];
