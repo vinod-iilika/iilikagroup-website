@@ -12,6 +12,7 @@ interface DashboardStats {
   testimonials: number
   teamMembers: number
   partnerLogos: number
+  activeOpenings: number
   newInquiries: number
   newApplications: number
 }
@@ -61,6 +62,7 @@ export default function AdminDashboardPage() {
       partnersRes,
       inquiriesRes,
       applicationsRes,
+      openingsRes,
     ] = await Promise.all([
       supabase.from('services').select('id', { count: 'exact', head: true }),
       supabase.from('products').select('id', { count: 'exact', head: true }),
@@ -71,6 +73,7 @@ export default function AdminDashboardPage() {
       supabase.from('partner_logos').select('id', { count: 'exact', head: true }),
       supabase.from('client_inquiries').select('id', { count: 'exact', head: true }).eq('status', 'new'),
       supabase.from('general_applications').select('id', { count: 'exact', head: true }).eq('status', 'new'),
+      supabase.from('job_openings').select('id', { count: 'exact', head: true }).eq('status', 'active'),
     ])
 
     setStats({
@@ -81,6 +84,7 @@ export default function AdminDashboardPage() {
       testimonials: testimonialsRes.count || 0,
       teamMembers: teamRes.count || 0,
       partnerLogos: partnersRes.count || 0,
+      activeOpenings: openingsRes.count || 0,
       newInquiries: inquiriesRes.count || 0,
       newApplications: applicationsRes.count || 0,
     })
@@ -144,6 +148,7 @@ export default function AdminDashboardPage() {
     { label: 'Testimonials', value: stats?.testimonials || 0, href: '/admin/testimonials', color: 'bg-pink-500' },
     { label: 'Team Members', value: stats?.teamMembers || 0, href: '/admin/team', color: 'bg-indigo-500' },
     { label: 'Partner Logos', value: stats?.partnerLogos || 0, href: '/admin/partners', color: 'bg-teal-500' },
+    { label: 'Job Openings', value: stats?.activeOpenings || 0, href: '/admin/job-openings', color: 'bg-rose-500' },
   ]
 
   return (
@@ -213,7 +218,7 @@ export default function AdminDashboardPage() {
       )}
 
       {/* Content Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {statCards.map((stat) => (
           <Link key={stat.label} href={stat.href} className="block">
             <div className="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
@@ -319,6 +324,15 @@ export default function AdminDashboardPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
             Add Case Study
+          </Link>
+          <Link
+            href="/admin/job-openings/new"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Add Job Opening
           </Link>
         </div>
       </div>

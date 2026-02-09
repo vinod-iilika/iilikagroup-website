@@ -1,5 +1,6 @@
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
+import ServicesProductsCarousel from "@/components/ServicesProductsCarousel";
 import Link from "next/link";
 
 export default function Staffing() {
@@ -211,6 +212,8 @@ export default function Staffing() {
         </div>
       </section>
 
+      <ServicesProductsCarousel />
+
       <section className="bg-[#333333] text-white py-16">
         <div className="container-custom text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Build Your Team?</h2>
@@ -222,6 +225,18 @@ export default function Staffing() {
               Hire Talent Now
             </Button>
           </Link>
+          <div className="flex items-center justify-center gap-4 mt-6">
+            <Link href="/case-studies">
+              <Button variant="outline" size="sm" className="border-white text-white hover:bg-white hover:text-[#333333]">
+                Case Studies
+              </Button>
+            </Link>
+            <Link href="/insights">
+              <Button variant="outline" size="sm" className="border-white text-white hover:bg-white hover:text-[#333333]">
+                Insights
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
     </>

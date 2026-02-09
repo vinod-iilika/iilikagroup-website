@@ -67,9 +67,9 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { number: "500+", label: "Engineers Deployed" },
+              { number: "180+", label: "Engineers Deployed" },
               { number: "50+", label: "Enterprise Clients" },
-              { number: "10+", label: "GCCs Enabled" },
+              { number: "5+", label: "GCCs Enabled" },
               { number: "95%", label: "Client Retention" },
             ].map((stat, index) => (
               <div key={index} className="text-center p-6">
@@ -97,13 +97,25 @@ export default function Home() {
         <div className="container-custom text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Build Your Team?</h2>
           <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
-            Let's discuss how we can help you with staffing, GCC enablement, or project delivery.
+            Let&apos;s discuss how we can help you with staffing, GCC enablement, or project delivery.
           </p>
           <Link href="/contact">
             <Button variant="primary" size="lg">
               Get in Touch
             </Button>
           </Link>
+          <div className="flex items-center justify-center gap-4 mt-6">
+            <Link href="/case-studies">
+              <Button variant="outline" size="sm" className="border-white text-white hover:bg-white hover:text-[#333333]">
+                Case Studies
+              </Button>
+            </Link>
+            <Link href="/insights">
+              <Button variant="outline" size="sm" className="border-white text-white hover:bg-white hover:text-[#333333]">
+                Insights
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
     </>

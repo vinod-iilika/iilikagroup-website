@@ -6,92 +6,99 @@ import { createClient } from '@/lib/supabase'
 import DataTable from '@/components/admin/DataTable'
 import { StatusBadge } from '@/components/admin/FormFields'
 
-interface PartnerLogo {
+interface JobOpening {
   id: string
-  company_name: string
-  logo_url: string
-  website_url: string | null
-  type: string
+  title: string
+  department: string | null
+  location: string | null
+  experience: string | null
+  employment_type: string
+  tech_stack: string[]
   display_order: number
   status: string
+  created_at: string
 }
 
-export default function PartnersPage() {
-  const [partners, setPartners] = useState<PartnerLogo[]>([])
+export default function JobOpeningsPage() {
+  const [openings, setOpenings] = useState<JobOpening[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
-  const [typeFilter, setTypeFilter] = useState('')
 
-  const fetchPartners = async () => {
+  const fetchOpenings = async () => {
     setLoading(true)
     try {
       const supabase = createClient()
       const { data } = await supabase
-        .from('partner_logos')
+        .from('job_openings')
         .select('*')
         .order('display_order', { ascending: true })
-      setPartners(data || [])
+      setOpenings(data || [])
     } catch (err) {
-      console.error('Error fetching partners:', err)
+      console.error('Error fetching job openings:', err)
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => {
-    fetchPartners()
+    fetchOpenings()
   }, [])
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this logo?')) return
+    if (!confirm('Are you sure you want to delete this job opening?')) return
     const supabase = createClient()
-    await supabase.from('partner_logos').delete().eq('id', id)
-    fetchPartners()
+    await supabase.from('job_openings').delete().eq('id', id)
+    fetchOpenings()
   }
 
-  const filteredPartners = partners.filter((item) => {
+  const filteredOpenings = openings.filter((item) => {
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase()
-      if (!item.company_name.toLowerCase().includes(q)) return false
+      if (
+        !item.title.toLowerCase().includes(q) &&
+        !(item.department?.toLowerCase().includes(q) ?? false) &&
+        !item.tech_stack.some((t) => t.toLowerCase().includes(q))
+      ) return false
     }
     if (statusFilter && item.status !== statusFilter) return false
-    if (typeFilter && item.type !== typeFilter) return false
     return true
   })
 
   const columns = [
     {
-      key: 'company_name',
-      label: 'Company',
-      render: (item: PartnerLogo) => (
-        <div className="flex items-center gap-3">
-          <img src={item.logo_url} alt="" className="w-12 h-8 object-contain" />
-          <span className="font-medium">{item.company_name}</span>
+      key: 'title',
+      label: 'Title',
+      render: (item: JobOpening) => (
+        <div>
+          <p className="font-medium">{item.title}</p>
+          {item.tech_stack.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-1">
+              {item.tech_stack.slice(0, 3).map((tech) => (
+                <span key={tech} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">
+                  {tech}
+                </span>
+              ))}
+              {item.tech_stack.length > 3 && (
+                <span className="text-xs text-gray-400">+{item.tech_stack.length - 3}</span>
+              )}
+            </div>
+          )}
         </div>
       ),
     },
     {
-      key: 'type',
-      label: 'Type',
-      render: (item: PartnerLogo) => (
-        <span className={`px-2 py-1 text-xs rounded capitalize ${
-          item.type === 'client' ? 'bg-blue-100 text-blue-700' :
-          item.type === 'partner' ? 'bg-green-100 text-green-700' :
-          'bg-purple-100 text-purple-700'
-        }`}>
-          {item.type}
-        </span>
-      ),
+      key: 'department',
+      label: 'Department',
     },
     {
-      key: 'display_order',
-      label: 'Order',
+      key: 'location',
+      label: 'Location',
     },
     {
       key: 'status',
       label: 'Status',
-      render: (item: PartnerLogo) => <StatusBadge status={item.status} />,
+      render: (item: JobOpening) => <StatusBadge status={item.status} />,
     },
   ]
 
@@ -99,12 +106,12 @@ export default function PartnersPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Partner Logos</h1>
-          <p className="text-gray-600">Manage client, partner, and technology logos</p>
+          <h1 className="text-2xl font-bold text-gray-900">Job Openings</h1>
+          <p className="text-gray-600">Manage job openings for the careers page</p>
         </div>
         <div className="flex items-center gap-3">
           <button
-            onClick={fetchPartners}
+            onClick={fetchOpenings}
             disabled={loading}
             className="inline-flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors disabled:opacity-50"
           >
@@ -114,13 +121,13 @@ export default function PartnersPage() {
             {loading ? 'Loading...' : 'Refresh'}
           </button>
           <Link
-            href="/admin/partners/new"
+            href="/admin/job-openings/new"
             className="inline-flex items-center gap-2 px-4 py-2 bg-[#FF000E] text-white rounded hover:bg-[#9E0008] transition-colors"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            Add Logo
+            Add Opening
           </Link>
         </div>
       </div>
@@ -130,25 +137,20 @@ export default function PartnersPage() {
           <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
-          <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search by company name..." className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF000E] focus:border-transparent text-sm" />
+          <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search by title, department, or tech..." className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF000E] focus:border-transparent text-sm" />
         </div>
         <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF000E] text-sm">
           <option value="">All Statuses</option>
+          <option value="draft">Draft</option>
           <option value="active">Active</option>
-          <option value="archived">Archived</option>
-        </select>
-        <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF000E] text-sm">
-          <option value="">All Types</option>
-          <option value="client">Client</option>
-          <option value="partner">Partner</option>
-          <option value="technology">Technology</option>
+          <option value="closed">Closed</option>
         </select>
       </div>
 
       <DataTable
         columns={columns}
-        data={filteredPartners}
-        basePath="/admin/partners"
+        data={filteredOpenings}
+        basePath="/admin/job-openings"
         onDelete={handleDelete}
         loading={loading}
       />

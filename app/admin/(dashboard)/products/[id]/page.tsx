@@ -54,6 +54,8 @@ export default function ProductEditPage() {
   const [loading, setLoading] = useState(!isNew)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [slugTouched, setSlugTouched] = useState(!isNew)
+  const [slugError, setSlugError] = useState<string | null>(null)
 
   const fetchProduct = useCallback(async () => {
     setLoading(true)
@@ -100,15 +102,33 @@ export default function ProductEditPage() {
 
   const generateSlug = (title: string) => title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 
+  const checkSlugUnique = async (slug: string) => {
+    if (!slug) { setSlugError(null); return true }
+    const supabase = createClient()
+    let query = supabase.from('products').select('id').eq('slug', slug)
+    if (!isNew) query = query.neq('id', params.id)
+    const { data } = await query
+    if (data && data.length > 0) {
+      setSlugError('This slug is already in use')
+      return false
+    }
+    setSlugError(null)
+    return true
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
     setSaving(true)
 
+    const finalSlug = form.slug || generateSlug(form.title)
+    const isUnique = await checkSlugUnique(finalSlug)
+    if (!isUnique) { setSaving(false); return }
+
     const supabase = createClient()
 
     const payload = {
-      slug: form.slug || generateSlug(form.title),
+      slug: finalSlug,
       title: form.title,
       tagline: form.tagline || null,
       description: form.description || null,
@@ -164,9 +184,16 @@ export default function ProductEditPage() {
       )}
 
       <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm p-6 space-y-6">
-        <Input label="Title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required placeholder="Product Name" />
+        <Input label="Title" value={form.title} onChange={(e) => {
+          const title = e.target.value
+          setForm({ ...form, title, ...(!slugTouched ? { slug: generateSlug(title) } : {}) })
+        }} required placeholder="Product Name" />
 
-        <Input label="Slug" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} placeholder="auto-generated-from-title" />
+        <Input label="Slug" value={form.slug} onChange={(e) => {
+          setSlugTouched(true)
+          setSlugError(null)
+          setForm({ ...form, slug: e.target.value })
+        }} onBlur={() => checkSlugUnique(form.slug)} error={slugError || undefined} placeholder="auto-generated-from-title" />
 
         <Input label="Tagline" value={form.tagline} onChange={(e) => setForm({ ...form, tagline: e.target.value })} placeholder="Short one-liner" />
 
@@ -223,7 +250,7 @@ export default function ProductEditPage() {
         </div>
 
         <div className="flex items-center gap-3 pt-4 border-t">
-          <button type="submit" disabled={saving} className="px-6 py-2 bg-[#FF000E] text-white rounded hover:bg-[#9E0008] transition-colors disabled:opacity-50">
+          <button type="submit" disabled={saving || !!slugError} className="px-6 py-2 bg-[#FF000E] text-white rounded hover:bg-[#9E0008] transition-colors disabled:opacity-50">
             {saving ? 'Saving...' : isNew ? 'Create Product' : 'Save Changes'}
           </button>
           <Link href="/admin/products" className="px-6 py-2 text-gray-700 hover:text-gray-900">Cancel</Link>

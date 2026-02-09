@@ -578,6 +578,60 @@ CREATE POLICY "Admin delete access" ON storage.objects
   );
 
 -- ============================================
+-- TABLE 11: JOB OPENINGS
+-- Admin-managed job postings for careers page
+-- ============================================
+
+CREATE TABLE job_openings (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  department TEXT,
+  location TEXT,
+  experience TEXT,
+  employment_type TEXT DEFAULT 'full-time' CHECK (employment_type IN ('full-time', 'part-time', 'contract')),
+  description TEXT,
+  tech_stack TEXT[] DEFAULT '{}',
+  display_order INTEGER DEFAULT 0,
+  status TEXT DEFAULT 'draft' CHECK (status IN ('draft', 'active', 'closed')),
+  -- Timestamps
+  created_at TIMESTAMPTZ DEFAULT TIMEZONE('utc', NOW()),
+  updated_at TIMESTAMPTZ DEFAULT TIMEZONE('utc', NOW())
+);
+
+-- Indexes
+CREATE INDEX idx_job_openings_status ON job_openings(status);
+CREATE INDEX idx_job_openings_order ON job_openings(display_order);
+
+-- Trigger for updated_at
+CREATE TRIGGER update_job_openings_updated_at
+  BEFORE UPDATE ON job_openings
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- ============================================
+-- ALTER: Add job_opening_id FK to general_applications
+-- Links applications to specific job openings (nullable = general application)
+-- ============================================
+
+ALTER TABLE general_applications
+  ADD COLUMN job_opening_id UUID REFERENCES job_openings(id) ON DELETE SET NULL;
+
+CREATE INDEX idx_general_applications_job_opening ON general_applications(job_opening_id);
+
+-- ============================================
+-- RLS for job_openings
+-- ============================================
+
+ALTER TABLE job_openings ENABLE ROW LEVEL SECURITY;
+
+-- Public can read active openings
+CREATE POLICY "Public read active job openings" ON job_openings
+  FOR SELECT USING (status = 'active');
+
+-- Admin full access
+CREATE POLICY "Admin full access job openings" ON job_openings
+  FOR ALL USING (is_admin()) WITH CHECK (is_admin());
+
+-- ============================================
 -- GRANTS (for completeness)
 -- ============================================
 

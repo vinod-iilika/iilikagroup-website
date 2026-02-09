@@ -22,6 +22,9 @@ interface Product {
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
+  const [typeFilter, setTypeFilter] = useState('')
 
   const fetchProducts = async () => {
     setLoading(true)
@@ -49,6 +52,16 @@ export default function ProductsPage() {
     await supabase.from('products').delete().eq('id', id)
     fetchProducts()
   }
+
+  const filteredProducts = products.filter((item) => {
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase()
+      if (!item.title.toLowerCase().includes(q) && !(item.tagline?.toLowerCase().includes(q) ?? false)) return false
+    }
+    if (statusFilter && item.status !== statusFilter) return false
+    if (typeFilter && item.type !== typeFilter) return false
+    return true
+  })
 
   const columns = [
     {
@@ -116,9 +129,30 @@ export default function ProductsPage() {
         </div>
       </div>
 
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search by title or tagline..." className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF000E] focus:border-transparent text-sm" />
+        </div>
+        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF000E] text-sm">
+          <option value="">All Statuses</option>
+          <option value="draft">Draft</option>
+          <option value="active">Active</option>
+          <option value="archived">Archived</option>
+        </select>
+        <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF000E] text-sm">
+          <option value="">All Types</option>
+          <option value="internal">Internal</option>
+          <option value="client">Client</option>
+          <option value="partner">Partner</option>
+        </select>
+      </div>
+
       <DataTable
         columns={columns}
-        data={products}
+        data={filteredProducts}
         basePath="/admin/products"
         onDelete={handleDelete}
         loading={loading}

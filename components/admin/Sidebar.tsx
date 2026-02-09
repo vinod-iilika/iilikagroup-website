@@ -25,6 +25,7 @@ const menuItems = [
       { title: 'Testimonials', href: '/admin/testimonials' },
       { title: 'Team Members', href: '/admin/team' },
       { title: 'Partner Logos', href: '/admin/partners' },
+      { title: 'Job Openings', href: '/admin/job-openings' },
     ],
   },
   {

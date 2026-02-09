@@ -1,5 +1,6 @@
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
+import ServicesProductsCarousel from "@/components/ServicesProductsCarousel";
 import Link from "next/link";
 
 export default function GCCEnablement() {
@@ -117,17 +118,31 @@ export default function GCCEnablement() {
         </div>
       </section>
 
+      <ServicesProductsCarousel />
+
       <section className="bg-[#333333] text-white py-16">
         <div className="container-custom text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Set Up Your GCC?</h2>
           <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
-            Let's discuss your GCC strategy and how we can help you establish a world-class capability center.
+            Let&apos;s discuss your GCC strategy and how we can help you establish a world-class capability center.
           </p>
           <Link href="/contact">
             <Button variant="primary" size="lg">
               Schedule a Consultation
             </Button>
           </Link>
+          <div className="flex items-center justify-center gap-4 mt-6">
+            <Link href="/case-studies">
+              <Button variant="outline" size="sm" className="border-white text-white hover:bg-white hover:text-[#333333]">
+                Case Studies
+              </Button>
+            </Link>
+            <Link href="/insights">
+              <Button variant="outline" size="sm" className="border-white text-white hover:bg-white hover:text-[#333333]">
+                Insights
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
     </>

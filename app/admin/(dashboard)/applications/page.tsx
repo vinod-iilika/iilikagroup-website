@@ -15,6 +15,8 @@ interface GeneralApplication {
   status: string
   admin_notes: string | null
   created_at: string
+  job_opening_id: string | null
+  job_openings: { title: string } | null
 }
 
 export default function ApplicationsPage() {
@@ -23,13 +25,16 @@ export default function ApplicationsPage() {
   const [selectedApp, setSelectedApp] = useState<GeneralApplication | null>(null)
   const [adminNotes, setAdminNotes] = useState('')
   const [saving, setSaving] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
+  const [typeFilter, setTypeFilter] = useState<'all' | 'job' | 'general'>('all')
 
   const fetchApplications = async () => {
     setLoading(true)
     const supabase = createClient()
     const { data } = await supabase
       .from('general_applications')
-      .select('*')
+      .select('*, job_openings(title)')
       .order('created_at', { ascending: false })
 
     setApplications(data || [])
@@ -63,6 +68,24 @@ export default function ApplicationsPage() {
     fetchApplications()
   }
 
+  const filteredApplications = applications.filter((app) => {
+    // Search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase()
+      const matchesSearch =
+        app.name.toLowerCase().includes(query) ||
+        app.email.toLowerCase().includes(query) ||
+        (app.job_openings?.title?.toLowerCase().includes(query) ?? false)
+      if (!matchesSearch) return false
+    }
+    // Status filter
+    if (statusFilter && app.status !== statusFilter) return false
+    // Type filter
+    if (typeFilter === 'job' && !app.job_opening_id) return false
+    if (typeFilter === 'general' && app.job_opening_id) return false
+    return true
+  })
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -75,8 +98,8 @@ export default function ApplicationsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">General Applications</h1>
-          <p className="text-gray-600">Manage general job applications from the contact page</p>
+          <h1 className="text-2xl font-bold text-gray-900">Applications</h1>
+          <p className="text-gray-600">Manage job applications from careers page and general submissions</p>
         </div>
         <button
           onClick={fetchApplications}
@@ -100,14 +123,57 @@ export default function ApplicationsPage() {
         </button>
       </div>
 
+      {/* Search & Filters */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <svg
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by name, email, or job title..."
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF000E] focus:border-transparent text-sm"
+          />
+        </div>
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF000E] text-sm"
+        >
+          <option value="">All Statuses</option>
+          <option value="new">New</option>
+          <option value="reviewed">Reviewed</option>
+          <option value="shortlisted">Shortlisted</option>
+          <option value="closed">Closed</option>
+        </select>
+        <select
+          value={typeFilter}
+          onChange={(e) => setTypeFilter(e.target.value as 'all' | 'job' | 'general')}
+          className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF000E] text-sm"
+        >
+          <option value="all">All Types</option>
+          <option value="job">Job Applications</option>
+          <option value="general">General Applications</option>
+        </select>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Application List */}
         <div className="lg:col-span-2 bg-white rounded-lg shadow-sm">
-          {applications.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">No applications yet</div>
+          {filteredApplications.length === 0 ? (
+            <div className="p-8 text-center text-gray-500">
+              {applications.length === 0 ? 'No applications yet' : 'No applications match your filters'}
+            </div>
           ) : (
             <div className="divide-y divide-gray-200">
-              {applications.map((app) => (
+              {filteredApplications.map((app) => (
                 <div
                   key={app.id}
                   onClick={() => {
@@ -121,8 +187,20 @@ export default function ApplicationsPage() {
                   <div className="flex items-start justify-between">
                     <div>
                       <p className="font-medium text-gray-900">{app.name}</p>
-                      <p className="text-sm text-gray-500">{app.role_interest || 'General Interest'}</p>
-                      <p className="text-xs text-gray-400">{app.email}</p>
+                      {app.job_openings?.title ? (
+                        <p className="text-xs mt-0.5">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded bg-blue-50 text-blue-700">
+                            Applied for: {app.job_openings.title}
+                          </span>
+                        </p>
+                      ) : (
+                        <p className="text-xs mt-0.5">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded bg-gray-50 text-gray-600">
+                            General Application
+                          </span>
+                        </p>
+                      )}
+                      <p className="text-xs text-gray-400 mt-0.5">{app.email}</p>
                     </div>
                     <div className="text-right">
                       <StatusBadge status={app.status} type="submission" />
@@ -182,9 +260,19 @@ export default function ApplicationsPage() {
                   </div>
                 )}
                 <div>
-                  <span className="text-gray-500">Role Interest:</span>
-                  <p className="font-medium">{selectedApp.role_interest || 'General Interest'}</p>
+                  <span className="text-gray-500">Applied For:</span>
+                  {selectedApp.job_openings?.title ? (
+                    <p className="font-medium text-blue-700">{selectedApp.job_openings.title}</p>
+                  ) : (
+                    <p className="font-medium text-gray-500">General Application</p>
+                  )}
                 </div>
+                {selectedApp.role_interest && (
+                  <div>
+                    <span className="text-gray-500">Role Interest:</span>
+                    <p className="font-medium">{selectedApp.role_interest}</p>
+                  </div>
+                )}
                 <div>
                   <span className="text-gray-500">Message:</span>
                   <p className="mt-1 text-gray-700 whitespace-pre-wrap">{selectedApp.message}</p>
