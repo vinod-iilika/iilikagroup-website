@@ -67,9 +67,9 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { number: "500+", label: "Engineers Deployed" },
+              { number: "180+", label: "Engineers Deployed" },
               { number: "50+", label: "Enterprise Clients" },
-              { number: "10+", label: "GCCs Enabled" },
+              { number: "5+", label: "GCCs Enabled" },
               { number: "95%", label: "Client Retention" },
             ].map((stat, index) => (
               <div key={index} className="text-center p-6">

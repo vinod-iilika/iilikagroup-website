@@ -20,6 +20,8 @@ interface CaseStudy {
 export default function CaseStudiesPage() {
   const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([])
   const [loading, setLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
 
   const fetchCaseStudies = async () => {
     setLoading(true)
@@ -47,6 +49,19 @@ export default function CaseStudiesPage() {
     await supabase.from('case_studies').delete().eq('id', id)
     fetchCaseStudies()
   }
+
+  const filteredCaseStudies = caseStudies.filter((item) => {
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase()
+      if (
+        !item.title.toLowerCase().includes(q) &&
+        !(item.client_name?.toLowerCase().includes(q) ?? false) &&
+        !(item.industry?.toLowerCase().includes(q) ?? false)
+      ) return false
+    }
+    if (statusFilter && item.status !== statusFilter) return false
+    return true
+  })
 
   const columns = [
     {
@@ -106,9 +121,24 @@ export default function CaseStudiesPage() {
         </div>
       </div>
 
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search by title, client, or industry..." className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF000E] focus:border-transparent text-sm" />
+        </div>
+        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF000E] text-sm">
+          <option value="">All Statuses</option>
+          <option value="draft">Draft</option>
+          <option value="published">Published</option>
+          <option value="archived">Archived</option>
+        </select>
+      </div>
+
       <DataTable
         columns={columns}
-        data={caseStudies}
+        data={filteredCaseStudies}
         basePath="/admin/case-studies"
         onDelete={handleDelete}
         loading={loading}

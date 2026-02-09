@@ -24,6 +24,8 @@ export default function InquiriesPage() {
   const [selectedInquiry, setSelectedInquiry] = useState<ClientInquiry | null>(null)
   const [adminNotes, setAdminNotes] = useState('')
   const [saving, setSaving] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
 
   const fetchInquiries = async () => {
     setLoading(true)
@@ -64,6 +66,19 @@ export default function InquiriesPage() {
     fetchInquiries()
   }
 
+  const filteredInquiries = inquiries.filter((item) => {
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase()
+      if (
+        !item.contact_name.toLowerCase().includes(q) &&
+        !item.company_name.toLowerCase().includes(q) &&
+        !item.email.toLowerCase().includes(q)
+      ) return false
+    }
+    if (statusFilter && item.status !== statusFilter) return false
+    return true
+  })
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -101,14 +116,32 @@ export default function InquiriesPage() {
         </button>
       </div>
 
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search by name, company, or email..." className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF000E] focus:border-transparent text-sm" />
+        </div>
+        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF000E] text-sm">
+          <option value="">All Statuses</option>
+          <option value="new">New</option>
+          <option value="contacted">Contacted</option>
+          <option value="qualified">Qualified</option>
+          <option value="closed">Closed</option>
+        </select>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Inquiry List */}
         <div className="lg:col-span-2 bg-white rounded-lg shadow-sm">
-          {inquiries.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">No inquiries yet</div>
+          {filteredInquiries.length === 0 ? (
+            <div className="p-8 text-center text-gray-500">
+              {inquiries.length === 0 ? 'No inquiries yet' : 'No inquiries match your search'}
+            </div>
           ) : (
             <div className="divide-y divide-gray-200">
-              {inquiries.map((inquiry) => (
+              {filteredInquiries.map((inquiry) => (
                 <div
                   key={inquiry.id}
                   onClick={() => {
