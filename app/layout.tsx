@@ -14,7 +14,10 @@ export const metadata: Metadata = {
   description:
     "Staffing, GCC enablement, and project delivery for modern enterprises. Building teams and GCCs that deliver.",
   icons: {
-    icon: "/images/iilika-groups.svg",
+    icon: [
+      { url: "/images/iilika-groups.svg", type: "image/svg+xml" },
+    ],
+    apple: "/images/iilika-groups-large.png",
   },
   openGraph: {
     type: "website",
@@ -23,7 +26,7 @@ export const metadata: Metadata = {
     images: [{ url: "/images/iilika-groups-large.png", width: 1200, height: 630 }],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
   },
   robots: {
     index: true,

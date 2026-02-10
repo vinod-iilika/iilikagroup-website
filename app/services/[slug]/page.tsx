@@ -2,6 +2,7 @@ import { createServerSupabaseClient } from "@/lib/supabase-server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Button from "@/components/ui/Button";
+import { JsonLd } from "@/components/JsonLd";
 
 export const dynamic = "force-dynamic";
 
@@ -43,6 +44,9 @@ export async function generateMetadata({ params }: ServicePageProps) {
   return {
     title,
     description,
+    alternates: {
+      canonical: `https://iilikagroups.com/services/${slug}`,
+    },
     openGraph: {
       title,
       description: description || undefined,
@@ -108,11 +112,23 @@ export default async function ServicePage({ params }: ServicePageProps) {
   const typedService = service as Service;
 
   return (
-    <article className="bg-white">
-      <section className="bg-gradient-to-b from-gray-50 to-white py-16">
-        <div className="container-custom">
-          <div className="max-w-4xl mx-auto">
-            <Link
+    <>
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: "https://iilikagroups.com" },
+            { "@type": "ListItem", position: 2, name: "Services", item: "https://iilikagroups.com/services" },
+            { "@type": "ListItem", position: 3, name: typedService.title },
+          ],
+        }}
+      />
+      <article className="bg-white">
+        <section className="bg-gradient-to-b from-gray-50 to-white py-16">
+          <div className="container-custom">
+            <div className="max-w-4xl mx-auto">
+              <Link
               href="/services"
               className="inline-flex items-center text-[#FF000E] hover:underline mb-6"
             >
@@ -169,5 +185,6 @@ export default async function ServicePage({ params }: ServicePageProps) {
         </div>
       </section>
     </article>
+    </>
   );
 }

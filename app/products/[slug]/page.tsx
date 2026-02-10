@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Button from "@/components/ui/Button";
+import { JsonLd } from "@/components/JsonLd";
 
 // Disable caching to always fetch fresh data
 export const dynamic = "force-dynamic";
@@ -54,6 +55,9 @@ export async function generateMetadata({ params }: ProductPageProps) {
   return {
     title,
     description,
+    alternates: {
+      canonical: `https://iilikagroups.com/products/${slug}`,
+    },
     openGraph: {
       title,
       description: description || undefined,
@@ -137,6 +141,17 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   return (
     <>
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: "https://iilikagroups.com" },
+            { "@type": "ListItem", position: 2, name: "Products", item: "https://iilikagroups.com/products" },
+            { "@type": "ListItem", position: 3, name: typedProduct.title },
+          ],
+        }}
+      />
       <article className="bg-white">
         {/* Header */}
         <section className="bg-gradient-to-b from-gray-50 to-white py-16">
