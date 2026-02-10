@@ -54,6 +54,9 @@ export async function generateMetadata({ params }: InsightPageProps) {
   return {
     title,
     description,
+    alternates: {
+      canonical: `https://iilikagroups.com/insights/${slug}`,
+    },
     openGraph: {
       title,
       description: description || undefined,
@@ -184,6 +187,17 @@ export default async function InsightPage({ params }: InsightPageProps) {
             name: "IILIKA GROUPS",
             url: "https://iilikagroups.com",
           },
+        }}
+      />
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: "https://iilikagroups.com" },
+            { "@type": "ListItem", position: 2, name: "Insights", item: "https://iilikagroups.com/insights" },
+            { "@type": "ListItem", position: 3, name: typedInsight.title },
+          ],
         }}
       />
       <article className="bg-white">
